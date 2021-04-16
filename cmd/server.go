@@ -10,6 +10,7 @@ import (
 
 	"github.com/sktelecom/tks-contract/pkg/log"
 	app "github.com/sktelecom/tks-info/cmd/application"
+	info "github.com/sktelecom/tks-info/cmd/info"
 	"github.com/sktelecom/tks-info/pkg/cert"
 	pb "github.com/sktelecom/tks-proto/pbgo"
 	//	grpclog "github.com/openinfradev/tks-info/pkg/log"
@@ -52,7 +53,7 @@ func main() {
 
 	s := grpc.NewServer(opts...)
 	pb.RegisterAppInfoServiceServer(s, &app.Server{})
-	//pb.RegisterInfoServiceServer(s, &cluster.Server{})
+	pb.RegisterInfoServiceServer(s, &info.Server{})
 
 	if err := s.Serve(lis); err != nil {
 		log.Fatal("failed to serve: ", err)
