@@ -44,10 +44,10 @@ func main() {
 
 	c := pb.NewAppInfoServiceClient(cc)
 
-	req := &pb.GetAppRequest{
-		ClusterId: "uuid",
+	req := &pb.IDRequest{
+		Id: "uuid",
 	}
-	res, err := c.GetAppID(context.Background(), req)
+	res, err := c.GetAppIDs(context.Background(), req)
 	if err != nil {
 		log.Fatal("error while calling GetAppId RPC", err)
 	}

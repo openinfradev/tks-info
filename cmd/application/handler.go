@@ -11,8 +11,8 @@ type Server struct {
 	pb.UnimplementedAppInfoServiceServer
 }
 
-func (*Server) GetAppID(ctx context.Context, req *pb.GetAppRequest) (*pb.IDsResponse, error) {
-	clusterId := req.GetClusterId()
+func (s *Server) GetAppIDs(ctx context.Context, req *pb.IDRequest) (*pb.IDsResponse, error) {
+	clusterId := req.GetId()
 	log.Info("clusterId: ", clusterId)
 
 	ids := []string{"111", "222"}
@@ -24,7 +24,7 @@ func (*Server) GetAppID(ctx context.Context, req *pb.GetAppRequest) (*pb.IDsResp
 	return res, nil
 }
 
-func (s *Server) GetAllApps(ctx context.Context, req *pb.IDRequest) (*pb.GetAppsResponse, error) {
+func (s *Server) GetAllAppsByClusterID(ctx context.Context, req *pb.IDRequest) (*pb.GetAppsResponse, error) {
 	clusterId := req.GetId()
 	log.Info("clusterId: ", clusterId)
 
@@ -32,7 +32,23 @@ func (s *Server) GetAllApps(ctx context.Context, req *pb.IDRequest) (*pb.GetApps
 	return res, nil
 }
 
-func (*Server) GetApps(ctx context.Context, req *pb.GetAppsRequest) (*pb.GetAppResponse, error) {
+func (s *Server) GetAppsByName(ctx context.Context, req *pb.GetAppsRequest) (*pb.GetAppsResponse, error) {
+	appName := req.GetAppName()
+	log.Info("app name: ", appName)
+
+	res := &pb.GetAppsResponse{}
+	return res, nil
+}
+
+func (s *Server) GetAppsByType(ctx context.Context, req *pb.GetAppsRequest) (*pb.GetAppsResponse, error) {
+	appType := req.GetType()
+	log.Info("app type: ", appType)
+
+	res := &pb.GetAppsResponse{}
+	return res, nil
+}
+
+func (*Server) GetApp(ctx context.Context, req *pb.GetAppRequest) (*pb.GetAppResponse, error) {
 	appId := req.GetAppId()
 	log.Info("appId: ", appId)
 
@@ -40,7 +56,7 @@ func (*Server) GetApps(ctx context.Context, req *pb.GetAppsRequest) (*pb.GetAppR
 	return res, nil
 }
 
-func (*Server) UpdateAppStatus(ctx context.Context, req *pb.UpdateAppStatusRequest) (*pb.SimpleResponse, error) {
+func (s *Server) UpdateAppStatus(ctx context.Context, req *pb.UpdateAppStatusRequest) (*pb.SimpleResponse, error) {
 	clusterId := req.GetClusterId()
 	log.Info("clusterId: ", clusterId)
 
@@ -51,7 +67,7 @@ func (*Server) UpdateAppStatus(ctx context.Context, req *pb.UpdateAppStatusReque
 	return res, nil
 }
 
-func (*Server) UpdateEndpoints(ctx context.Context, req *pb.UpdateEndpointsRequest) (*pb.SimpleResponse, error) {
+func (s *Server) UpdateEndpoints(ctx context.Context, req *pb.UpdateEndpointsRequest) (*pb.SimpleResponse, error) {
 	clusterId := req.GetClusterId()
 	log.Info("clusterId: ", clusterId)
 
