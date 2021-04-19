@@ -24,7 +24,7 @@ func (*Server) GetAppID(ctx context.Context, req *pb.GetAppRequest) (*pb.IDsResp
 	return res, nil
 }
 
-func (*Server) GetAllApps(ctx context.Context, req *pb.IDRequest) (*pb.GetAppsResponse, error) {
+func (s *Server) GetAllApps(ctx context.Context, req *pb.IDRequest) (*pb.GetAppsResponse, error) {
 	clusterId := req.GetId()
 	log.Info("clusterId: ", clusterId)
 

@@ -33,6 +33,7 @@ github.com/google/go-cmp v0.5.0/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/
 github.com/google/go-cmp v0.5.5 h1:Khx7svrCpmxxtHBq5j2mp/xVjsi8hQMfNLvJFAlrGgU=
 github.com/google/go-cmp v0.5.5/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/gNBxE=
 github.com/google/uuid v1.1.2/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
+github.com/google/uuid v1.2.0 h1:qJYtXnJRWmpe7m/3XlyhrsLrEURqHRM2kxzoxXqyUDs=
 github.com/google/uuid v1.2.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
@@ -42,8 +43,12 @@ github.com/sirupsen/logrus v1.8.1/go.mod h1:yWOB1SBYBC5VeMP7gHvWumXLIWorT60ONWic
 github.com/sktelecom/tks-contract v0.1.0 h1:hBbCJ48ZMp7aM1CCvDYtWbK/xBY2YYwlXKlUb/n2Eb4=
 github.com/sktelecom/tks-contract v0.1.0/go.mod h1:i2uuH5rf1dW3wyIbdTS1E16sztpr6mU5xnkvDS7fhYQ=
 github.com/sktelecom/tks-proto v0.0.2/go.mod h1:5r0c5Sq4RhX5IuVIyD/aRunO7WUHmpymBOBz9LTCaRY=
-github.com/sktelecom/tks-proto v0.0.4 h1:yHaT829Bp2kQxxpVy5knwkxPT0KPeKoLBkYsxWos/Sk=
-github.com/sktelecom/tks-proto v0.0.4/go.mod h1:5r0c5Sq4RhX5IuVIyD/aRunO7WUHmpymBOBz9LTCaRY=
+github.com/sktelecom/tks-proto v0.0.4-0.20210415020726-a2f0aa64ce68 h1:Ml6UdifDet7bNzVY5LI3zJBpgMCf0ZYPm7ruujSLEWE=
+github.com/sktelecom/tks-proto v0.0.4-0.20210415020726-a2f0aa64ce68/go.mod h1:5r0c5Sq4RhX5IuVIyD/aRunO7WUHmpymBOBz9LTCaRY=
+github.com/sktelecom/tks-proto v0.0.4-0.20210416024508-5b272aaa0e9c h1:U/2lS9HTjvbbQmHYhlPxdAcweLoia9rm9MCjdpNa17g=
+github.com/sktelecom/tks-proto v0.0.4-0.20210416024508-5b272aaa0e9c/go.mod h1:5r0c5Sq4RhX5IuVIyD/aRunO7WUHmpymBOBz9LTCaRY=
+github.com/sktelecom/tks-proto v0.0.4-0.20210416044312-03b6d2655a9d h1:bNG5d3t/JjUt7EKIGWC7si2l/fCGjO4yR3NJsVSw+ag=
+github.com/sktelecom/tks-proto v0.0.4-0.20210416044312-03b6d2655a9d/go.mod h1:5r0c5Sq4RhX5IuVIyD/aRunO7WUHmpymBOBz9LTCaRY=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/testify v1.2.2/go.mod h1:a8OnRcib4nhh0OaRAV+Yts87kKdq0PP7pXfy6kDkUVs=
 github.com/stretchr/testify v1.5.1 h1:nOGnQDM7FYENwehXlg/kFVnos3rEvtKTjRvOWSzb6H4=
