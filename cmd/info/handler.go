@@ -117,8 +117,8 @@ func (s *Server) GetCSPAuth(ctx context.Context, in *pb.IDRequest) (*pb.GetCSPAu
 	}, nil
 }
 
-// CreateCluster create cluster on the multicuster with csp id
-func (s *Server) CreateCluster(ctx context.Context, in *pb.CreateClusterRequest) (*pb.IDResponse, error) {
+// AddClusterInfo add newly created cluster with csp id
+func (s *Server) AddClusterInfo(ctx context.Context, in *pb.AddClusterInfoRequest) (*pb.IDResponse, error) {
 	return nil, nil
 }
 
