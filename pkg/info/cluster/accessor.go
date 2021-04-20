@@ -9,6 +9,10 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
+const (
+	MAX_RETRY_COUNT = 10
+)
+
 // Accessor accesses to csp info in-memory data.
 type Accessor struct {
 	clusters map[ID]Cluster
@@ -70,12 +74,12 @@ func (c Accessor) List() []Cluster {
 
 // Create creates new cluster with contract ID, csp ID, name.
 func (c *Accessor) Create(contractID ID, cspID ID, name string, conf *pb.ClusterConf) (ID, error) {
-	newClusterID := ID(uuid.New().String())
-	if _, exists := c.clusters[newClusterID]; exists {
-		return "", fmt.Errorf("cluster id %s does already exist.", newClusterID)
+	newID, err := c.GenerateNewClusterID()
+	if err != nil {
+		return newID, err
 	}
-	c.clusters[newClusterID] = Cluster{
-		ID:            newClusterID,
+	c.clusters[newID] = Cluster{
+		ID:            newID,
 		ContractID:    contractID,
 		CspID:         cspID,
 		Name:          name,
@@ -83,7 +87,7 @@ func (c *Accessor) Create(contractID ID, cspID ID, name string, conf *pb.Cluster
 		CreatedTs:     time.Now(),
 		LastUpdatedTs: time.Now(),
 	}
-	return newClusterID, nil
+	return newID, nil
 }
 
 // UpdateStatus updates an status of cluster for Cluster.
@@ -115,4 +119,15 @@ func (c Accessor) ClustertToPbCluster(cluster Cluster) *pb.Cluster {
 		Conf:          cluster.Conf,
 		Kubeconfig:    cluster.Kubeconfig,
 	}
+}
+
+// GenerateNewClusterID returns unique ID for cluster.
+func (c Accessor) GenerateNewClusterID() (ID, error) {
+	for i := 0; i < MAX_RETRY_COUNT; i++ {
+		newID := ID(uuid.New().String())
+		if _, exists := c.clusters[newID]; !exists {
+			return newID, nil
+		}
+	}
+	return ID(""), fmt.Errorf("Failed to generate new cluster ID")
 }
