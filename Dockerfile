@@ -6,8 +6,8 @@ WORKDIR /build
 
 COPY go.mod .
 COPY go.sum .
-RUN go mod vendor
 COPY . .
+RUN go get -d -v ./...
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o bin/tksinfo ./cmd/server.go
 
 RUN mkdir -p /dist
