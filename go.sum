@@ -51,6 +51,8 @@ github.com/sktelecom/tks-proto v0.0.4-0.20210416044312-03b6d2655a9d h1:bNG5d3t/J
 github.com/sktelecom/tks-proto v0.0.4-0.20210416044312-03b6d2655a9d/go.mod h1:5r0c5Sq4RhX5IuVIyD/aRunO7WUHmpymBOBz9LTCaRY=
 github.com/sktelecom/tks-proto v0.0.4-0.20210419050352-2299e8d5d653 h1:plu5huLviWEh5uJyyVf3AZoYl8sajUtn2KfzkU2+wFs=
 github.com/sktelecom/tks-proto v0.0.4-0.20210419050352-2299e8d5d653/go.mod h1:5r0c5Sq4RhX5IuVIyD/aRunO7WUHmpymBOBz9LTCaRY=
+github.com/sktelecom/tks-proto v0.0.4-0.20210419072147-cbafa000deab h1:Jqxkx4bq1uC6Y5BRaqo2eKE8eCdewluZ+1aTtDAk0d0=
+github.com/sktelecom/tks-proto v0.0.4-0.20210419072147-cbafa000deab/go.mod h1:5r0c5Sq4RhX5IuVIyD/aRunO7WUHmpymBOBz9LTCaRY=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/testify v1.2.2/go.mod h1:a8OnRcib4nhh0OaRAV+Yts87kKdq0PP7pXfy6kDkUVs=
 github.com/stretchr/testify v1.5.1 h1:nOGnQDM7FYENwehXlg/kFVnos3rEvtKTjRvOWSzb6H4=
