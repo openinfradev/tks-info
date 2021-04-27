@@ -24,6 +24,8 @@ var (
 func main() {
 	log.Info("Hello I'm a application client")
 
+	flag.Parse()
+
 	opts := grpc.WithInsecure()
 	if *tls {
 		if *caFile == "" {
