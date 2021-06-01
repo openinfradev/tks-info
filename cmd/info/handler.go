@@ -205,8 +205,3 @@ func (s *Server) UpdateClusterStatus(ctx context.Context, in *pb.UpdateClusterSt
 		Error: nil,
 	}, nil
 }
-
-// ValidateLabelUniqueness check uniqueness of the label
-func (s *Server) ValidateLabelUniqueness(ctx context.Context, in *pb.ValidateLabelUniquenessRequest) (*pb.ValidateLabelUniquenessResponse, error) {
-	return nil, nil
-}

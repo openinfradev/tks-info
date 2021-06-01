@@ -155,8 +155,6 @@ func (x *Accessor) GetApps(appGroupID uuid.UUID, appType pb.AppType) ([]*pb.Appl
 func (x *Accessor) UpdateApp(appGroupID uuid.UUID, appType pb.AppType, endpoint, metadata string) error {
 	res := x.db.Model(&model.Application{}).Where("app_group_id = ? AND type = ?", appGroupID, appType).
 		Updates(map[string]interface{}{"endpoint": endpoint, "metadata": metadata})
-	log.Info(res.Error)
-	log.Info(res.RowsAffected)
 	if res.Error != nil {
 		return res.Error
 	} else if res.RowsAffected == 0 {
