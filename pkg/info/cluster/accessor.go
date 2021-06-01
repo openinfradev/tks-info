@@ -3,10 +3,13 @@ package cluster
 import (
 	"fmt"
 	"time"
-
-	"github.com/google/uuid"
-	pb "github.com/sktelecom/tks-proto/pbgo"
+  uuid "github.com/google/uuid"
+  "gorm.io/gorm"
 	"google.golang.org/protobuf/types/known/timestamppb"
+
+  "github.com/sktelecom/tks-contract/pkg/log"
+  model "github.com/sktelecom/tks-contract/pkg/contract/model"
+  pb "github.com/sktelecom/tks-proto/pbgo"
 )
 
 const (
@@ -15,83 +18,100 @@ const (
 
 // Accessor accesses to csp info in-memory data.
 type Accessor struct {
-	clusters map[ID]Cluster
+  db *gorm.DB
 }
 
 // NewClusterAccessor returns new Accessor to access clusters.
-func NewClusterAccessor() *Accessor {
-	return &Accessor{
-		clusters: map[ID]Cluster{},
-	}
+func New(db *gorm.DB) *Accessor {
+  return &Accessor{
+    db: db,
+  }
 }
 
 // Get returns a Cluster if it exists.
-func (c Accessor) Get(id ID) (Cluster, error) {
-	cluster, exists := c.clusters[id]
-	if !exists {
-		return Cluster{}, fmt.Errorf("Cluster ID %s does not exist.", id)
-	}
-	return cluster, nil
+func (c Accessor) Get(id uuid.UUID) (*pb.Cluster, error) {
+  var cluster model.Cluster
+  res := x.db.First(&cluster, id)
+  if res.RowsAffected == 0 || res.Error != nil {
+    return &pb.Cluster{}, fmt.Errorf("Could not find Cluster with ID: %s", id)
+  }
+
+	return &cluster, nil
 }
 
 // GetClusterIDsByContractID returns a list of cluster ID by contract ID if it exists.
-func (c Accessor) GetClusterIDsByContractID(id ID) ([]ID, error) {
-	res := []ID{}
-	for _, cluster := range c.clusters {
-		if cluster.ContractID == id {
-			res = append(res, cluster.ID)
-		}
+func (c Accessor) GetClusterIDsByContractID(contractId uuid.UUID) ([]uuid.UUID, error) {
+  var cluster model.Cluster
+  // This is possible, too
+  // cluster := model.Cluster{}
+
+  res := x.db.Select("id").Find(&cluster, "contract_id = ?", contractId)
+
+  if res.RowsAffected == 0 || res.Error != nil {
+    return &model.Cluster{}, fmt.Errorf("Could not find cluster with contractID: %s", contractId)
+  }
+
+  // how to return array of IDs?
+  clusterIdArr := []uuid.UUID
+  //clusterIdArr := make([]uuid.UUID, len??)
+
+	for _, item := range cluster {
+		clusterIdArr = append(clusterIdArr, item)
 	}
-	if len(res) == 0 {
-		return res, fmt.Errorf("Cluster for contract id %s does not exist.", id)
-	}
-	return res, nil
+
+	return clusterIdArr, nil
 }
 
-// GetClusterIDsByCspID returns a list of cluster ID by Csp ID if it exists.
-func (c Accessor) GetClustersByCspID(cspId ID) ([]Cluster, error) {
-	res := []Cluster{}
-	for _, cluster := range c.clusters {
-		if cluster.CspID == cspId {
-			res = append(res, cluster)
-		}
-	}
-	if len(res) == 0 {
-		return res, fmt.Errorf("Cluster for Csp id %s does not exist.", cspId)
-	}
-	return res, nil
+// GetClusterIDsByCspID returns a list of clusters by CspID if it exists.
+// Robert: model and pb are different. what should I return?
+func (c Accessor) GetClustersByCspID(cspId ID) (*[]pb.Cluster, error) {
+  var cluster model.Cluster
+
+  res := x.db.Find(&cluster, "csp_id = ?", cspId)
+
+  if res.RowsAffected == 0 || res.Error != nil {
+    return &pb.Cluster{}, fmt.Errorf("Could not find cluster with cspID: %s", cspId)
+  }
+
+  //resultContracts = append(resultContracts, reflectToPbContract(contract, &pbQuota))
+  //return ConvertToPbCluster(cluster)
+
+	return &cluster, nil
 }
 
 // List returns a list of clusters in array.
-func (c Accessor) List() []Cluster {
-	res := []Cluster{}
+func (c Accessor) List() *[]pb.Cluster {
+  var cluster model.Cluster
 
-	for _, t := range c.clusters {
-		res = append(res, t)
-	}
-	return res
+  res := x.db.Find(&cluster)
+
+  //resultContracts = append(resultContracts, reflectToPbContract(contract, &pbQuota))
+
+  return cluster
 }
 
 // Create creates new cluster with contract ID, csp ID, name.
-func (c *Accessor) Create(contractID ID, cspID ID, name string, conf *pb.ClusterConf) (ID, error) {
-	newID, err := c.GenerateNewClusterID()
-	if err != nil {
-		return newID, err
-	}
-	c.clusters[newID] = Cluster{
-		ID:            newID,
-		ContractID:    contractID,
-		CspID:         cspID,
-		Name:          name,
-		Status:        pb.ClusterStatus_UNSPECIFIED,
-		CreatedTs:     time.Now(),
-		LastUpdatedTs: time.Now(),
-	}
-	return newID, nil
+func (c *Accessor) Create(contractID ID, cspID uuid.UUID, name string, conf *pb.ClusterConf) (uuid.UUID, error) {
+  cluster := model.cluster{
+    ContractID: contractID,
+    CspID: cspID,
+    Name: name,
+    Status: pb.ClusterStatus_UNSPECIFIED
+  }
+  err := x.db.Transaction(func(tx *gorm.DB) error {
+    res := tx.Create(&cluster)
+    if res.Error != nil {
+      return res.Error
+    }
+  }
+
+  return cluster.ID, nil
 }
 
+// Robert: Done until this line
+
 // UpdateStatus updates an status of cluster for Cluster.
-func (c *Accessor) UpdateStatus(id ID, status pb.ClusterStatus) error {
+func (c *Accessor) UpdateStatus(id uuid.UUID, status pb.ClusterStatus) error {
 	if _, exists := c.clusters[id]; !exists {
 		return fmt.Errorf("Cluster ID %s does not exist.", id)
 	}
@@ -108,7 +128,7 @@ func (c *Accessor) UpdateStatus(id ID, status pb.ClusterStatus) error {
 	return nil
 }
 
-func (c Accessor) ClustertToPbCluster(cluster Cluster) *pb.Cluster {
+func (c Accessor) ConvertToPbCluster(cluster Cluster) *pb.Cluster {
 	return &pb.Cluster{
 		Id:         string(cluster.ID),
 		Name:       cluster.Name,
@@ -119,15 +139,4 @@ func (c Accessor) ClustertToPbCluster(cluster Cluster) *pb.Cluster {
 		Conf:       cluster.Conf,
 		Kubeconfig: cluster.Kubeconfig,
 	}
-}
-
-// GenerateNewClusterID returns unique ID for cluster.
-func (c Accessor) GenerateNewClusterID() (ID, error) {
-	for i := 0; i < MAX_RETRY_COUNT; i++ {
-		newID := ID(uuid.New().String())
-		if _, exists := c.clusters[newID]; !exists {
-			return newID, nil
-		}
-	}
-	return ID(""), fmt.Errorf("Failed to generate new cluster ID")
 }

@@ -3,84 +3,91 @@ package csp
 import (
 	"fmt"
 	"time"
+	uuid "github.com/google/uuid"
+  "gorm.io/gorm"
 
-	"github.com/google/uuid"
 	"github.com/sktelecom/tks-contract/pkg/log"
+  model "github.com/sktelecom/tks-contract/pkg/contract/model"
+  pb "github.com/sktelecom/tks-proto/pbgo"
 )
 
 // Accessor accesses to csp info in-memory data.
 type Accessor struct {
-	cspinfos map[ID]CSPInfo
+  db *gorm.DB
 }
 
 // NewCSPAccessor returns new Accessor to access csp info.
-func NewCSPAccessor() *Accessor {
+//func NewCSPAccessor(db *gorm.DB) *Accessor {
+func New(db *gorm.DB) *Accessor {
 	return &Accessor{
-		cspinfos: map[ID]CSPInfo{},
+		db: db,
 	}
 }
 
 // Get returns a CSP Info if it exists.
-func (c Accessor) Get(id ID) (CSPInfo, error) {
-	csp, exists := c.cspinfos[id]
-	if !exists {
-		return CSPInfo{}, fmt.Errorf("CSP ID %s does not exist.", id)
+// Robert: Is it okay to return CSPInfo by value??
+func (c Accessor) GetCSPInfo(id uuid.UUID) (CSPInfo, error) {
+  var cspInfo model.CSPInfo
+	res := x.db.First(&cspInfo, id)
+	if res.RowsAffected == 0 || res.Error != nil {
+		return model.CSPInfo{}, fmt.Errorf("Could not find CSPInfo with ID: %s", id)
 	}
-	return csp, nil
+
+	return cspInfo, nil
 }
 
 // GetCSPIDsByContractID returns a list of CSP ID by contract ID if it exists.
-func (c Accessor) GetCSPIDsByContractID(id ID) ([]ID, error) {
-	res := []ID{}
-	for _, csp := range c.cspinfos {
-		if csp.ContractID == id {
-			log.Info("same")
-			res = append(res, csp.ID)
-		}
+func (c Accessor) GetCSPIDsByContractID(contractId uuid.UUID) ([]uuid.UUID, error) {
+  var cspInfo model.CSPInfo
+
+  res := x.db.Select("id").Find(&cspInfo, "contract_id = ?", contractId)
+
+	if res.RowsAffected == 0 || res.Error != nil {
+		return &model.CSPInfo{}, fmt.Errorf("Could not find CSPInfo with contract ID: %s", contractId)
 	}
-	if len(res) == 0 {
-		return res, fmt.Errorf("CSP for contract id %s does not exist.", id)
-	}
-	return res, nil
+
+  // Robert: does cspInfo contains cspIds only now? need to construct array?
+
+
+
+
+  return cspInfo, nil
 }
+
 
 // List returns a list of CSP Infos in array.
 func (c Accessor) List() []CSPInfo {
-	res := []CSPInfo{}
+  var cspInfo model.CSPInfo
 
-	for _, t := range c.cspinfos {
-		res = append(res, t)
-	}
-	return res
+	res := x.db.Find(&cspInfo)
+	return cspInfo
 }
 
 // Create creates new CSP info with contractID and auth.
-func (c *Accessor) Create(contractID ID, auth string) (ID, error) {
-	newCSPID := ID(uuid.New().String())
-	if _, exists := c.cspinfos[newCSPID]; exists {
-		return "", fmt.Errorf("csp id %s does already exist.", newCSPID)
-	}
-	c.cspinfos[newCSPID] = CSPInfo{
-		ID:            newCSPID,
-		ContractID:    contractID,
-		Auth:          auth,
-		CreatedTs:     time.Now(),
-		LastUpdatedTs: time.Now(),
-	}
-	return newCSPID, nil
+func (c *Accessor) Create(contractID uuid.UUID, auth string) (uuid.UUID, error) {
+	cspInfo := model.cspInfo{ContractID: contractID, Auth: auth}
+	err := x.db.Transaction(func(tx *gorm.DB) error {
+		res := tx.Create(&cspInfo)
+		if res.Error != nil {
+			return res.Error
+		}
+  }
+
+  return cspInfo.ID, nil
 }
 
 // Update updates an authentication info for CSP.
-func (c *Accessor) Update(id ID, auth string) error {
-	if _, exists := c.cspinfos[id]; !exists {
-		return fmt.Errorf("CSP ID %s does not exist.", id)
+// Robert: need to return prev and current??
+// Robert: need to return prev and current??
+// Robert: need to return prev and current??
+func (c *Accessor) Update(id ID, auth string) (prev *pb.cspInfo, curr, error) {
+	res := x.db.Model(&model.cspInfo{}).
+		Where("ID = ?", id).
+		Updates("Auth", auth)
+
+	if res.Error != nil || res.RowsAffected == 0 {
+		return nil, nil, fmt.Errorf("nothing updated in cspInfo for id %s", ID)
 	}
-	c.cspinfos[id] = CSPInfo{
-		ID:            c.cspinfos[id].ID,
-		ContractID:    c.cspinfos[id].ContractID,
-		Auth:          auth,
-		CreatedTs:     c.cspinfos[id].CreatedTs,
-		LastUpdatedTs: time.Now(),
-	}
-	return nil
+
+  return prev, curr, nil
 }
