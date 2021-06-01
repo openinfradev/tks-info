@@ -110,14 +110,14 @@ func (c *Accessor) UpdateStatus(id ID, status pb.ClusterStatus) error {
 
 func (c Accessor) ClustertToPbCluster(cluster Cluster) *pb.Cluster {
 	return &pb.Cluster{
-		Id:            string(cluster.ID),
-		Name:          cluster.Name,
-		CreatedTs:     timestamppb.New(cluster.CreatedTs),
-		LastUpdatedTs: timestamppb.New(cluster.CreatedTs),
-		Status:        cluster.Status,
-		ContractId:    string(cluster.ContractID),
-		Conf:          cluster.Conf,
-		Kubeconfig:    cluster.Kubeconfig,
+		Id:         string(cluster.ID),
+		Name:       cluster.Name,
+		CreatedAt:  timestamppb.New(cluster.CreatedTs),
+		UpdatedAt:  timestamppb.New(cluster.CreatedTs),
+		Status:     cluster.Status,
+		ContractId: string(cluster.ContractID),
+		Conf:       cluster.Conf,
+		Kubeconfig: cluster.Kubeconfig,
 	}
 }
 
