@@ -17,7 +17,6 @@ import (
 var (
 	clusterID  uuid.UUID
 	appGroupID uuid.UUID
-	appID      uuid.UUID
 	appName    string
 	accessor   *application.Accessor
 )
