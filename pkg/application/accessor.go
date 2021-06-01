@@ -105,7 +105,7 @@ func (x *Accessor) GetAppGroup(appGroupID uuid.UUID) (*pb.AppGroup, error) {
 func (x *Accessor) UpdateAppGroupStatus(appGroupID uuid.UUID, status pb.AppGroupStatus) error {
 	res := x.db.Model(&model.ApplicationGroup{}).
 		Where("id = ?", appGroupID).
-		Updates(map[string]interface{}{"status": status})
+		Update("status", status)
 
 	if res.Error != nil {
 		return res.Error
