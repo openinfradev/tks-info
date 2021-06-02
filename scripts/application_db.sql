@@ -15,7 +15,7 @@ CREATE TABLE applications
     type bigint,
     app_group_id uuid,
     endpoint character varying(200) COLLATE pg_catalog."default",
-    metadata character varying(1000) COLLATE pg_catalog."default",
+    metadata json,
     updated_at timestamp with time zone,
     created_at timestamp with time zone
 );

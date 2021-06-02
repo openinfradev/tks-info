@@ -9,6 +9,7 @@ import (
 	"github.com/sktelecom/tks-info/pkg/application/model"
 	pb "github.com/sktelecom/tks-proto/pbgo"
 	"google.golang.org/protobuf/types/known/timestamppb"
+	"gorm.io/datatypes"
 	"gorm.io/gorm"
 )
 
@@ -170,7 +171,7 @@ func (x *Accessor) createApplication(appGroupID uuid.UUID, appType pb.AppType, e
 		AppGroupId: appGroupID,
 		Type:       appType,
 		Endpoint:   endpoint,
-		Metadata:   metadata,
+		Metadata:   datatypes.JSON([]byte(metadata)),
 	}
 	res := x.db.Create(&app)
 	if res.Error != nil {
@@ -214,7 +215,7 @@ func reflectToPbApplication(model model.Application) *pb.Application {
 		AppGroupId: model.AppGroupId.String(),
 		Type:       model.Type,
 		Endpoint:   model.Endpoint,
-		Metadata:   model.Metadata,
+		Metadata:   model.Metadata.String(),
 		CreatedAt:  timestamppb.New(model.CreatedAt),
 		UpdatedAt:  timestamppb.New(model.UpdatedAt),
 	}

@@ -95,11 +95,11 @@ func TestUpdateAppGroupStatus(t *testing.T) {
 
 func TestUpdateApp(t *testing.T) {
 	if err := accessor.UpdateApp(appGroupID, pb.AppType_PROMETHEUS,
-		"http://localhost:9090", ""); err != nil {
+		"http://localhost:9090", "{\"metadata\":\"no_data\"}"); err != nil {
 		t.Errorf("an error was unexpected while update prometheus: %s", err)
 	}
 	if err := accessor.UpdateApp(appGroupID, pb.AppType_KIALI,
-		"http://localhost:9090", ""); err != nil {
+		"http://localhost:20001", "{\"metadata\":\"no_data\"}"); err != nil {
 		t.Errorf("an error was unexpected while update kiali: %s", err)
 	}
 }
