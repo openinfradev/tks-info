@@ -9,9 +9,9 @@ require (
 	github.com/sktelecom/tks-proto v0.0.5-0.20210601070539-28e30ba879cd
 	google.golang.org/grpc v1.38.0
 	google.golang.org/protobuf v1.26.0
-	gorm.io/datatypes v1.0.1 // indirect
-	gorm.io/driver/postgres v1.1.0 // indirect
-	gorm.io/gorm v1.21.10 // indirect
+	gorm.io/datatypes v1.0.1
+	gorm.io/driver/postgres v1.1.0
+	gorm.io/gorm v1.21.10
 )
 
 replace github.com/sktelecom/tks-info => ./
