@@ -4,25 +4,27 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"time"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 
+	"github.com/google/uuid"
 	"github.com/sktelecom/tks-contract/pkg/log"
 	"github.com/sktelecom/tks-info/pkg/cert"
 	pb "github.com/sktelecom/tks-proto/pbgo"
-	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 )
 
 var (
-	port   = flag.Int("port", 9111, "The gRPC server port")
-	tls    = flag.Bool("tls", false, "Connection uses TLS if true, else plain TCP")
-	caFile = flag.String("ca_file", "", "The TLS ca file")
+	port       = flag.Int("port", 9111, "The gRPC server port")
+	tls        = flag.Bool("tls", false, "Connection uses TLS if true, else plain TCP")
+	caFile     = flag.String("ca_file", "", "The TLS ca file")
+	clusterID  = uuid.New().String()
+	appGroupID string
 )
 
 func main() {
 	log.Info("Hello I'm a application client")
+	log.Info("new Cluster ID: ", clusterID)
 
 	flag.Parse()
 
@@ -46,155 +48,98 @@ func main() {
 	}
 	defer cc.Close()
 
-	doAddApp(cc)
-	doDeleteApp(cc)
-	doGetAppIDs(cc)
-	doGetAllAppsByClusterID(cc)
-	doGetAppsByName(cc)
-	doGetAppsByType(cc)
-	doGetApp(cc)
+	doCreateAppGroup(cc)
+	doGetAppGroupsByClusterID(cc)
+	doGetAppGroups(cc)
+	doGetAppGroup(cc)
+	doUpdateAppGroupStatus(cc)
 	doUpdateApp(cc)
-	doUpdateAppStatus(cc)
-	doUpdateEndpoints(cc)
+	doGetAppsByAppGroupID(cc)
+	doDeleteAppGroup(cc)
 }
 
-func doAddApp(cc *grpc.ClientConn) {
+func doCreateAppGroup(cc *grpc.ClientConn) {
 	c := pb.NewAppInfoServiceClient(cc)
 
-	req := &pb.AddAppRequest{
-		ClusterId: "ccc",
-		ServiceApp: &pb.ServiceApp{
-			AppName: "my_service_mesh",
-			Type:    pb.AppType_SERVICE_MESH,
-			Owner:   "ccc",
-			Status:  pb.AppStatus_APP_RUNNING,
-			Endpoints: []*pb.Endpoint{
-				{
-					Type: pb.EpType_KIALI,
-					Url:  "kiali.istio-system.svc.cluster.k1",
-				},
-				{
-					Type: pb.EpType_JAEGER,
-					Url:  "jaeger.istio-system.svc.cluster.k1",
-				},
-			},
+	req := &pb.CreateAppGroupRequest{
+		ClusterId: clusterID,
+		AppGroup: &pb.AppGroup{
+			AppGroupName:  "my_service_mesh",
+			Type:          pb.AppGroupType_SERVICE_MESH,
+			Status:        pb.AppGroupStatus_APP_GROUP_INSTALLING,
 			ExternalLabel: "service_mesh",
-			CreatedTs:     timestamppb.New(time.Now()),
 		},
 	}
-	res, err := c.AddApp(context.Background(), req)
+	res, err := c.CreateAppGroup(context.Background(), req)
 	if err != nil {
-		log.Fatal("error while calling AddApp RPC", err)
+		log.Fatal("error while calling CreateAppGroup RPC", err)
 	}
-	log.Info("Response from AddApp: ", res.GetId())
+	appGroupID = res.GetId()
+	log.Info("Response from CreateAppGroup: ", res.GetId())
 }
 
-func doDeleteApp(cc *grpc.ClientConn) {
-	c := pb.NewAppInfoServiceClient(cc)
-
-	req := &pb.DeleteAppRequest{
-		ClusterId: "ccc",
-		AppId:     "111",
-	}
-	res, err := c.DeleteApp(context.Background(), req)
-	if err != nil {
-		log.Fatal("error while calling DeleteApp RPC", err)
-	}
-	log.Info("Response from DeleteApp: ", res.GetCode())
-}
-
-func doGetAppIDs(cc *grpc.ClientConn) {
+func doGetAppGroupsByClusterID(cc *grpc.ClientConn) {
 	c := pb.NewAppInfoServiceClient(cc)
 
 	req := &pb.IDRequest{
-		Id: "ccc",
+		Id: clusterID,
 	}
-	res, err := c.GetAppIDs(context.Background(), req)
+	res, err := c.GetAppGroupsByClusterID(context.Background(), req)
 	if err != nil {
-		log.Fatal("error while calling GetAppId RPC", err)
+		log.Fatal("error while calling GetAppGroupsByClusterID RPC", err)
 	}
-	log.Info("Response from GetAppId: ", res.GetIds())
+	log.Info("Response from GetAppGroupsByClusterID: ", res)
 }
 
-func doGetAllAppsByClusterID(cc *grpc.ClientConn) {
+func doGetAppGroups(cc *grpc.ClientConn) {
 	c := pb.NewAppInfoServiceClient(cc)
 
-	req := &pb.IDRequest{
-		Id: "ccc",
+	req := &pb.GetAppGroupsRequest{
+		AppGroupName: "my_service_mesh",
+		Type:         pb.AppGroupType_SERVICE_MESH,
 	}
-	res, err := c.GetAllAppsByClusterID(context.Background(), req)
+	res, err := c.GetAppGroups(context.Background(), req)
 	if err != nil {
-		log.Fatal("error while calling GetAllAppsByClusterID RPC", err)
+		log.Fatal("error while calling GetAppGroups RPC", err)
 	}
-	log.Info("Response from GetAllAppsByClusterID: ", res)
+	log.Info("Response from GetAppGroups: ", res)
 }
 
-func doGetAppsByName(cc *grpc.ClientConn) {
+func doGetAppGroup(cc *grpc.ClientConn) {
 	c := pb.NewAppInfoServiceClient(cc)
 
-	req := &pb.GetAppsRequest{
-		ClusterId: "ccc",
-		AppName:   "my",
+	req := &pb.GetAppGroupRequest{
+		AppGroupId: appGroupID,
 	}
-	res, err := c.GetAppsByName(context.Background(), req)
+	res, err := c.GetAppGroup(context.Background(), req)
 	if err != nil {
-		log.Fatal("error while calling GetAppsByName RPC", err)
+		log.Fatal("error while calling GetAppGroup RPC", err)
 	}
-	log.Info("Response from GetAppsByName: ", res)
+	log.Info("Response from GetAppGroup: ", res)
 }
 
-func doGetAppsByType(cc *grpc.ClientConn) {
+func doUpdateAppGroupStatus(cc *grpc.ClientConn) {
 	c := pb.NewAppInfoServiceClient(cc)
 
-	req := &pb.GetAppsRequest{
-		ClusterId: "ccc",
-		Type:      pb.AppType_SERVICE_MESH,
+	req := &pb.UpdateAppGroupStatusRequest{
+		AppGroupId: appGroupID,
+		Status:     pb.AppGroupStatus_APP_GROUP_ERROR,
 	}
-	res, err := c.GetAppsByType(context.Background(), req)
+	res, err := c.UpdateAppGroupStatus(context.Background(), req)
 	if err != nil {
-		log.Fatal("error while calling GetAppsByType RPC", err)
+		log.Fatal("error while calling UpdateAppGroupStatus RPC", err)
 	}
-	log.Info("Response from GetAppsByType: ", res)
-}
-
-func doGetApp(cc *grpc.ClientConn) {
-	c := pb.NewAppInfoServiceClient(cc)
-
-	req := &pb.GetAppRequest{
-		ClusterId: "ccc",
-		AppId:     "111",
-	}
-	res, err := c.GetApp(context.Background(), req)
-	if err != nil {
-		log.Fatal("error while calling GetApp RPC", err)
-	}
-	log.Info("Response from GetApp: ", res)
+	log.Info("Response from UpdateAppGroupStatus: ", res)
 }
 
 func doUpdateApp(cc *grpc.ClientConn) {
 	c := pb.NewAppInfoServiceClient(cc)
 
 	req := &pb.UpdateAppRequest{
-		ClusterId: "ccc",
-		ServiceApp: &pb.ServiceApp{
-			AppId:   "111",
-			AppName: "my_service_mesh",
-			Type:    pb.AppType_SERVICE_MESH,
-			Owner:   "ccc",
-			Status:  pb.AppStatus_APP_RUNNING,
-			Endpoints: []*pb.Endpoint{
-				{
-					Type: pb.EpType_KIALI,
-					Url:  "kiali.istio-system.svc.cluster.k1",
-				},
-				{
-					Type: pb.EpType_JAEGER,
-					Url:  "jaeger.istio-system.svc.cluster.k1",
-				},
-			},
-			ExternalLabel: "service_mesh",
-			LastUpdatedTs: timestamppb.New(time.Now()),
-		},
+		AppGroupId: appGroupID,
+		AppType:    pb.AppType_KIALI,
+		Endpoint:   "https://localhost:20001",
+		Metadata:   "",
 	}
 	res, err := c.UpdateApp(context.Background(), req)
 	if err != nil {
@@ -203,41 +148,31 @@ func doUpdateApp(cc *grpc.ClientConn) {
 	log.Info("Response from UpdateApp: ", res.GetCode())
 }
 
-func doUpdateAppStatus(cc *grpc.ClientConn) {
+func doGetAppsByAppGroupID(cc *grpc.ClientConn) {
 	c := pb.NewAppInfoServiceClient(cc)
 
-	req := &pb.UpdateAppStatusRequest{
-		ClusterId: "ccc",
-		AppId:     "111",
-		Status:    pb.AppStatus_APP_RUNNING,
+	req := &pb.IDRequest{
+		Id: appGroupID,
 	}
-	res, err := c.UpdateAppStatus(context.Background(), req)
+	res, err := c.GetAppsByAppGroupID(context.Background(), req)
 	if err != nil {
-		log.Fatal("error while calling UpdateAppStatus RPC", err)
+		log.Fatal("error while calling GetAppsByAppGroupID RPC", err)
 	}
-	log.Info("Response from UpdateAppStatus: ", res.GetCode())
+	log.Info("Response from GetAppsByAppGroupID: ")
+	for _, app := range res.Apps {
+		log.Info(fmt.Sprintf("id %s, type %d, endpoint %s", app.AppId, app.Type, app.Endpoint))
+	}
 }
 
-func doUpdateEndpoints(cc *grpc.ClientConn) {
+func doDeleteAppGroup(cc *grpc.ClientConn) {
 	c := pb.NewAppInfoServiceClient(cc)
 
-	req := &pb.UpdateEndpointsRequest{
-		ClusterId: "ccc",
-		AppId:     "111",
-		Endpoints: []*pb.Endpoint{
-			{
-				Type: pb.EpType_KIALI,
-				Url:  "kiali.istio-system.svc.cluster.k1",
-			},
-			{
-				Type: pb.EpType_JAEGER,
-				Url:  "jaeger.istio-system.svc.cluster.k1",
-			},
-		},
+	req := &pb.DeleteAppGroupRequest{
+		AppGroupId: appGroupID,
 	}
-	res, err := c.UpdateEndpoints(context.Background(), req)
+	res, err := c.DeleteAppGroup(context.Background(), req)
 	if err != nil {
-		log.Fatal("error while calling UpdateEndpoints RPC", err)
+		log.Fatal("error while calling DeleteApp RPC", err)
 	}
-	log.Info("Response from UpdateEndpoints: ", res.GetCode())
+	log.Info("Response from DeleteApp: ", res.GetCode())
 }
