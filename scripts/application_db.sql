@@ -1,3 +1,5 @@
+CREATE DATABASE tks;
+\c tks;
 CREATE TABLE application_groups
 (
     name character varying(50) COLLATE pg_catalog."default",
