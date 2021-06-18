@@ -44,8 +44,7 @@ func (x *ClusterAccessor) GetClustersByContractID(contractId uuid.UUID) ([]*pb.C
   res := x.db.Find(&clusters, "contract_id = ?", contractId)
 
   if res.RowsAffected == 0 || res.Error != nil {
-    // Robert: Is this correct?
-    return []*pb.Cluster{}, fmt.Errorf("Could not find clusters with contractID: %s", contractId)
+    return nil, fmt.Errorf("Could not find clusters with contractID: %s", contractId)
   }
 
   pbClusters := []*pb.Cluster{}

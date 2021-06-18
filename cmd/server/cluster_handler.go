@@ -9,7 +9,6 @@ import (
   "github.com/google/uuid"
   "github.com/sktelecom/tks-contract/pkg/log"
   "github.com/sktelecom/tks-info/pkg/cluster"
-  "github.com/sktelecom/tks-info/pkg/csp_info"
   pb "github.com/sktelecom/tks-proto/pbgo"
 )
 

@@ -11,8 +11,6 @@ import (
   "gorm.io/gorm"
 
   "github.com/sktelecom/tks-contract/pkg/log"
-  //app "github.com/sktelecom/tks-info/cmd/application"
-  //info "github.com/sktelecom/tks-info/cmd/info"
   "github.com/sktelecom/tks-info/pkg/cert"
   pb "github.com/sktelecom/tks-proto/pbgo"
 )
