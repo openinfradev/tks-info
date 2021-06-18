@@ -15,7 +15,6 @@ import (
 
 var (
   clusterAccessor *cluster.ClusterAccessor
-  cspInfoAccessor *csp_info.CspInfoAccessor
 )
 
 type ClusterInfoServer struct {
@@ -53,8 +52,8 @@ func (s *ClusterInfoServer) AddClusterInfo(ctx context.Context, in *pb.AddCluste
     return &res, err
   }
 
-  // return an error if csp id does not exist.
-  // Robert: Is this necessary? If so, what about contractID check?
+  // Return an error if csp id does not exist.
+  // TODO: Need to add logic to check if the contractID exists using GRPC call to tks-contract.
   if _, err := cspInfoAccessor.GetCSPInfo(cspId); err != nil {
     return &pb.IDResponse{
       Code: pb.Code_NOT_FOUND,

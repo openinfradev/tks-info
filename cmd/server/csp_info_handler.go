@@ -11,9 +11,9 @@ import (
   pb "github.com/sktelecom/tks-proto/pbgo"
 )
 
-//var (
-//  cspInfoAccessor     *csp_info.Accessor
-//)
+var (
+  cspInfoAccessor *csp_info.CspInfoAccessor
+)
 
 type CspInfoServer struct {
   pb.UnimplementedCspInfoServiceServer
