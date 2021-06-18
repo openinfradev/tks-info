@@ -40,7 +40,7 @@ func TestCreateClusterInfo(t *testing.T) {
     K8SVersion: "1.18.8",
   }
 
-  clusterId, err = clusterAccessor.CreateClusterInfo(contractId, cspId, clusterName, dummyConf)
+  clusterId, err = clusterAccessor.CreateClusterInfo(contractId, cspId, clusterName, &dummyConf)
   if err != nil {
     t.Errorf("An error occurred while creating new clusterInfo. Err: %s", err)
   }

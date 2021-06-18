@@ -65,7 +65,7 @@ func (s *ClusterInfoServer) AddClusterInfo(ctx context.Context, in *pb.AddCluste
   }
 
   // Create cluster record
-  cID, err := clusterAccessor.CreateClusterInfo(contractId, cspId, in.GetName(), *(in.GetConf()))
+  cID, err := clusterAccessor.CreateClusterInfo(contractId, cspId, in.GetName(), in.GetConf())
   if err != nil {
     return &pb.IDResponse{
       Code: pb.Code_INTERNAL,
@@ -123,8 +123,7 @@ func (s *ClusterInfoServer) GetClusters(ctx context.Context, in *pb.GetClustersR
     res := pb.GetClustersResponse{
       Code: pb.Code_INVALID_ARGUMENT,
       Error: &pb.Error{
-        //Msg: fmt.Sprintf("Either contractID or cspId must be provided"),
-        Msg: fmt.Sprintf("Neither contractID or cspId was provided. Exactly one of those must be provided."),
+        Msg: "Neither contractID or cspId was provided. Exactly one of those must be provided.",
       },
       Clusters: nil,
     }
@@ -134,7 +133,7 @@ func (s *ClusterInfoServer) GetClusters(ctx context.Context, in *pb.GetClustersR
     res := pb.GetClustersResponse{
       Code: pb.Code_INVALID_ARGUMENT,
       Error: &pb.Error{
-        Msg: fmt.Sprintf("Both contractID and cspId was provided. Exactly one of those must be provided."),
+        Msg: "Both contractID and cspId was provided. Exactly one of those must be provided.",
       },
       Clusters: nil,
     }

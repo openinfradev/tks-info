@@ -134,7 +134,16 @@ func (s *CspInfoServer) GetCSPAuth(ctx context.Context, in *pb.IDRequest) (*pb.G
     return &res, err
   }
 
-  cspInfo, err := cspInfoAccessor.GetCSPInfo(cspId)
+  cspInfo, err2 := cspInfoAccessor.GetCSPInfo(cspId)
+  if err2 != nil {
+    res := pb.GetCSPAuthResponse{
+      Code: pb.Code_NOT_FOUND,
+      Error: &pb.Error{
+        Msg: err2.Error(),
+      },
+    }
+    return &res, err2
+  }
 
   return &pb.GetCSPAuthResponse{
     Code:  pb.Code_OK_UNSPECIFIED,

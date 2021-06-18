@@ -75,7 +75,7 @@ func (x *ClusterAccessor) GetClustersByCspID(cspId uuid.UUID) ([]*pb.Cluster, er
 }
 
 // Create creates new cluster with contract ID, csp ID, name.
-func (x *ClusterAccessor) CreateClusterInfo(contractId uuid.UUID, cspId uuid.UUID, name string, conf pb.ClusterConf) (uuid.UUID, error) {
+func (x *ClusterAccessor) CreateClusterInfo(contractId uuid.UUID, cspId uuid.UUID, name string, conf *pb.ClusterConf) (uuid.UUID, error) {
   cluster := model.Cluster{
     ContractID: contractId,
     CspID: cspId,
