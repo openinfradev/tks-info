@@ -1,4 +1,4 @@
-package application
+package main
 
 import (
 	"context"
@@ -14,15 +14,15 @@ import (
 
 var acc *app.Accessor
 
-type Server struct {
+type AppInfoServer struct {
 	pb.UnimplementedAppInfoServiceServer
 }
 
-func Initialize(db *gorm.DB) {
+func InitAppInfoHandler(db *gorm.DB) {
 	acc = application.New(db)
 }
 
-func (s *Server) CreateAppGroup(ctx context.Context, in *pb.CreateAppGroupRequest) (*pb.IDResponse, error) {
+func (s *AppInfoServer) CreateAppGroup(ctx context.Context, in *pb.CreateAppGroupRequest) (*pb.IDResponse, error) {
 	clusterID, err := uuid.Parse(in.GetClusterId())
 	if err != nil {
 		res := pb.IDResponse{
@@ -54,7 +54,7 @@ func (s *Server) CreateAppGroup(ctx context.Context, in *pb.CreateAppGroupReques
 	return res, nil
 }
 
-func (s *Server) GetAppGroupsByClusterID(ctx context.Context, in *pb.IDRequest) (*pb.GetAppGroupsResponse, error) {
+func (s *AppInfoServer) GetAppGroupsByClusterID(ctx context.Context, in *pb.IDRequest) (*pb.GetAppGroupsResponse, error) {
 	clusterID, err := uuid.Parse(in.GetId())
 	if err != nil {
 		return &pb.GetAppGroupsResponse{
@@ -83,7 +83,7 @@ func (s *Server) GetAppGroupsByClusterID(ctx context.Context, in *pb.IDRequest) 
 	}, err
 }
 
-func (s *Server) GetAppGroups(ctx context.Context, in *pb.GetAppGroupsRequest) (*pb.GetAppGroupsResponse, error) {
+func (s *AppInfoServer) GetAppGroups(ctx context.Context, in *pb.GetAppGroupsRequest) (*pb.GetAppGroupsResponse, error) {
 	if in.GetAppGroupName() == "" && in.GetType() == pb.AppGroupType_APP_TYPE_UNSPECIFIED {
 		err := fmt.Errorf("not efficient conditions to query app group.")
 		return &pb.GetAppGroupsResponse{
@@ -113,7 +113,7 @@ func (s *Server) GetAppGroups(ctx context.Context, in *pb.GetAppGroupsRequest) (
 	return res, nil
 }
 
-func (s *Server) GetAppGroup(ctx context.Context, in *pb.GetAppGroupRequest) (*pb.GetAppGroupResponse, error) {
+func (s *AppInfoServer) GetAppGroup(ctx context.Context, in *pb.GetAppGroupRequest) (*pb.GetAppGroupResponse, error) {
 	appGroupID, err := uuid.Parse(in.GetAppGroupId())
 	if err != nil {
 		return &pb.GetAppGroupResponse{
@@ -142,7 +142,7 @@ func (s *Server) GetAppGroup(ctx context.Context, in *pb.GetAppGroupRequest) (*p
 
 }
 
-func (*Server) UpdateAppGroupStatus(ctx context.Context, in *pb.UpdateAppGroupStatusRequest) (*pb.SimpleResponse, error) {
+func (*AppInfoServer) UpdateAppGroupStatus(ctx context.Context, in *pb.UpdateAppGroupStatusRequest) (*pb.SimpleResponse, error) {
 	appGroupID, err := uuid.Parse(in.GetAppGroupId())
 	if err != nil {
 		return &pb.SimpleResponse{
@@ -167,7 +167,7 @@ func (*Server) UpdateAppGroupStatus(ctx context.Context, in *pb.UpdateAppGroupSt
 	}, nil
 }
 
-func (s *Server) DeleteAppGroup(ctx context.Context, in *pb.DeleteAppGroupRequest) (*pb.SimpleResponse, error) {
+func (s *AppInfoServer) DeleteAppGroup(ctx context.Context, in *pb.DeleteAppGroupRequest) (*pb.SimpleResponse, error) {
 	appGroupID, err := uuid.Parse(in.GetAppGroupId())
 	if err != nil {
 		return &pb.SimpleResponse{
@@ -192,7 +192,7 @@ func (s *Server) DeleteAppGroup(ctx context.Context, in *pb.DeleteAppGroupReques
 	}, nil
 }
 
-func (*Server) GetAppsByAppGroupID(ctx context.Context, in *pb.IDRequest) (*pb.GetAppsResponse, error) {
+func (*AppInfoServer) GetAppsByAppGroupID(ctx context.Context, in *pb.IDRequest) (*pb.GetAppsResponse, error) {
 	appGroupID, err := uuid.Parse(in.GetId())
 	if err != nil {
 		return &pb.GetAppsResponse{
@@ -219,7 +219,7 @@ func (*Server) GetAppsByAppGroupID(ctx context.Context, in *pb.IDRequest) (*pb.G
 	}, nil
 }
 
-func (*Server) GetApps(ctx context.Context, in *pb.GetAppsRequest) (*pb.GetAppsResponse, error) {
+func (*AppInfoServer) GetApps(ctx context.Context, in *pb.GetAppsRequest) (*pb.GetAppsResponse, error) {
 	appGroupID, err := uuid.Parse(in.GetAppGroupId())
 	if err != nil {
 		return &pb.GetAppsResponse{
@@ -246,7 +246,7 @@ func (*Server) GetApps(ctx context.Context, in *pb.GetAppsRequest) (*pb.GetAppsR
 	}, nil
 }
 
-func (*Server) UpdateApp(ctx context.Context, in *pb.UpdateAppRequest) (*pb.SimpleResponse, error) {
+func (*AppInfoServer) UpdateApp(ctx context.Context, in *pb.UpdateAppRequest) (*pb.SimpleResponse, error) {
 	appGroupID, err := uuid.Parse(in.GetAppGroupId())
 	if err != nil {
 		return &pb.SimpleResponse{
