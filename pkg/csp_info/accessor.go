@@ -6,6 +6,7 @@ import (
   "gorm.io/gorm"
 
   model "github.com/sktelecom/tks-info/pkg/csp_info/model"
+  pb "github.com/sktelecom/tks-proto/pbgo"
 )
 
 // Accessor accesses to csp info in-memory data.
@@ -49,8 +50,8 @@ func (x *CspInfoAccessor) GetCSPIDsByContractID(contractId uuid.UUID) ([]string,
 }
 
 // Create creates new CSP info with contractID and auth.
-func (x *CspInfoAccessor) Create(contractId uuid.UUID, name string, auth string) (uuid.UUID, error) {
-  cspInfo := model.CSPInfo{ContractID: contractId, Name: name, Auth: auth}
+func (x *CspInfoAccessor) Create(contractId uuid.UUID, name string, auth string, cspType pb.CspType ) (uuid.UUID, error) {
+  cspInfo := model.CSPInfo{ContractID: contractId, Name: name, Auth: auth, CspType: cspType}
 
   res := x.db.Create(&cspInfo)
   if res.Error != nil {

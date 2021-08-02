@@ -23,6 +23,7 @@ type Cluster struct {
   WorkerRootSize    int64
   K8sVersion        string
   Kubeconfig        string
+  Region            string
   UpdatedAt         time.Time
   CreatedAt         time.Time
 }

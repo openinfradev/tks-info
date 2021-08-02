@@ -17,3 +17,6 @@ vendor/
 .idea/
 .DS_Store
 .vscode/
+
+cmd/server/server
+

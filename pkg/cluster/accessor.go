@@ -87,6 +87,7 @@ func (x *ClusterAccessor) CreateClusterInfo(contractId uuid.UUID, cspId uuid.UUI
     WorkerReplicas: conf.WorkerReplicas,
     WorkerRootSize: conf.WorkerRootSize,
     K8sVersion: conf.K8SVersion,
+    Region: conf.Region,
   }
 
   res := x.db.Create(&cluster)
@@ -120,6 +121,7 @@ func ConvertToPbCluster(cluster model.Cluster) *pb.Cluster {
     WorkerReplicas: cluster.WorkerReplicas,
     WorkerRootSize: cluster.WorkerRootSize,
     K8SVersion: cluster.K8sVersion,
+    Region: cluster.Region,
   }
 
   return &pb.Cluster{

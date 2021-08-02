@@ -2,6 +2,8 @@ package model
 
 import (
   "time"
+
+  pb "github.com/sktelecom/tks-proto/pbgo"
   uuid "github.com/google/uuid"
   "gorm.io/gorm"
 )
@@ -12,6 +14,7 @@ type CSPInfo struct {
   ContractID        uuid.UUID
   Name              string
   Auth              string
+  CspType           pb.CspType
   UpdatedAt         time.Time
   CreatedAt         time.Time
 }
