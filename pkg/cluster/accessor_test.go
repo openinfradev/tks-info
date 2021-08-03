@@ -38,6 +38,7 @@ func TestCreateClusterInfo(t *testing.T) {
     WorkerReplicas: 5,
     WorkerRootSize: 50,
     K8SVersion: "1.18.8",
+    Region: "ap-southeast-2",
   }
 
   clusterId, err = clusterAccessor.CreateClusterInfo(contractId, cspId, clusterName, &dummyConf)
