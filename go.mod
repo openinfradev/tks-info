@@ -17,8 +17,5 @@ require (
 	gorm.io/gorm v1.21.10
 )
 
-replace (
-	github.com/sktelecom/tks-proto => ../tks-proto
-	github.com/sktelecom/tks-info => ./
-)
+replace github.com/sktelecom/tks-info => ./
 

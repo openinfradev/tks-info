@@ -26,7 +26,6 @@ func InitCspInfoHandler(db *gorm.DB) {
 // CreateCSPInfo create new CSP Info for the contract id.
 func (s *CspInfoServer) CreateCSPInfo(ctx context.Context, in *pb.CreateCSPInfoRequest) (*pb.IDResponse, error) {
   log.Info("Request CreateCSPInfo for contractID ", in.GetContractId())
-  log.Info("Request test for cspType ", in.GetCspType())
 
   contractId, err := uuid.Parse(in.GetContractId())
   if err != nil {
@@ -82,8 +81,6 @@ func (s *CspInfoServer) GetCSPInfo(ctx context.Context, in *pb.IDRequest) (*pb.G
     }
     return &res, err2
   }
-
-  log.Debug("cspInfo : %s ", cspInfo.Name )
 
   return &pb.GetCSPInfoResponse{
     Code:  pb.Code_OK_UNSPECIFIED,
