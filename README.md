@@ -1,3 +1,3 @@
 # tks-info
 
-TKS (Taco Kubernetes Service) 
+TKS (Taco Kubernetes Service) - information
