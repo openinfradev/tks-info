@@ -6,11 +6,11 @@ WORKDIR /build
 
 COPY . .
 RUN go mod tidy && go mod vendor
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o bin/tksinfo ./cmd/server.go
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o bin/server ./cmd/server
 
 RUN mkdir -p /dist
 WORKDIR /dist
-RUN cp /build/bin/tksinfo ./tksinfo
+RUN cp /build/bin/server ./server
 
 
 
@@ -22,5 +22,5 @@ WORKDIR /app
 COPY --chown=0:0 --from=builder /dist /app/
 EXPOSE 9111
 
-ENTRYPOINT ["/app/tksinfo"]
-CMD ["--port", "9111"]
+ENTRYPOINT ["/app/server"]
+CMD ["-port", "9110"]
