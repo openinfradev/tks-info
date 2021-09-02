@@ -5,9 +5,9 @@ import (
 	"fmt"
 
 	"github.com/google/uuid"
-	"github.com/sktelecom/tks-contract/pkg/log"
-	"github.com/sktelecom/tks-info/pkg/application/model"
-	pb "github.com/sktelecom/tks-proto/pbgo"
+	"github.com/openinfradev/tks-contract/pkg/log"
+	"github.com/openinfradev/tks-info/pkg/application/model"
+	pb "github.com/openinfradev/tks-proto/pbgo"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"gorm.io/datatypes"
 	"gorm.io/gorm"

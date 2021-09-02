@@ -7,9 +7,9 @@ import (
   "gorm.io/gorm"
   "google.golang.org/protobuf/types/known/timestamppb"
 
-  _ "github.com/sktelecom/tks-contract/pkg/log"
-  model "github.com/sktelecom/tks-info/pkg/cluster/model"
-  pb "github.com/sktelecom/tks-proto/pbgo"
+  _ "github.com/openinfradev/tks-contract/pkg/log"
+  model "github.com/openinfradev/tks-info/pkg/cluster/model"
+  pb "github.com/openinfradev/tks-proto/pbgo"
 )
 
 // Accessor accesses cluster info in DB.

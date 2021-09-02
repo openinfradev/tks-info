@@ -5,7 +5,7 @@ import (
   uuid "github.com/google/uuid"
   "gorm.io/gorm"
 
-  model "github.com/sktelecom/tks-info/pkg/csp_info/model"
+  model "github.com/openinfradev/tks-info/pkg/csp_info/model"
 )
 
 // Accessor accesses to csp info in-memory data.
