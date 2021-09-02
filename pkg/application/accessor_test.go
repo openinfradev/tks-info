@@ -10,8 +10,8 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 
-	"github.com/sktelecom/tks-info/pkg/application"
-	pb "github.com/sktelecom/tks-proto/pbgo"
+	"github.com/openinfradev/tks-info/pkg/application"
+	pb "github.com/openinfradev/tks-proto/pbgo"
 )
 
 var (

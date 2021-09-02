@@ -5,7 +5,7 @@ import (
   uuid "github.com/google/uuid"
   "gorm.io/gorm"
   "gorm.io/driver/postgres"
-  "github.com/sktelecom/tks-info/pkg/csp_info"
+  "github.com/openinfradev/tks-info/pkg/csp_info"
 )
 
 var (

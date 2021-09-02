@@ -9,9 +9,9 @@ import (
 	"google.golang.org/grpc/credentials"
 
 	"github.com/google/uuid"
-	"github.com/sktelecom/tks-contract/pkg/log"
-	"github.com/sktelecom/tks-info/pkg/cert"
-	pb "github.com/sktelecom/tks-proto/pbgo"
+	"github.com/openinfradev/tks-contract/pkg/log"
+	"github.com/openinfradev/tks-info/pkg/cert"
+	pb "github.com/openinfradev/tks-proto/pbgo"
 )
 
 var (

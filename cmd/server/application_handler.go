@@ -5,10 +5,10 @@ import (
 	"fmt"
 
 	"github.com/google/uuid"
-	"github.com/sktelecom/tks-contract/pkg/log"
-	"github.com/sktelecom/tks-info/pkg/application"
-	app "github.com/sktelecom/tks-info/pkg/application"
-	pb "github.com/sktelecom/tks-proto/pbgo"
+	"github.com/openinfradev/tks-contract/pkg/log"
+	"github.com/openinfradev/tks-info/pkg/application"
+	app "github.com/openinfradev/tks-info/pkg/application"
+	pb "github.com/openinfradev/tks-proto/pbgo"
 	"gorm.io/gorm"
 )
 

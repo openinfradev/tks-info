@@ -3,7 +3,7 @@ package model
 import (
   "time"
 
-  pb "github.com/sktelecom/tks-proto/pbgo"
+  pb "github.com/openinfradev/tks-proto/pbgo"
   uuid "github.com/google/uuid"
   "gorm.io/gorm"
 )

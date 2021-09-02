@@ -6,8 +6,8 @@ import (
   uuid "github.com/google/uuid"
   "gorm.io/gorm"
   "gorm.io/driver/postgres"
-  "github.com/sktelecom/tks-info/pkg/cluster"
-  pb "github.com/sktelecom/tks-proto/pbgo"
+  "github.com/openinfradev/tks-info/pkg/cluster"
+  pb "github.com/openinfradev/tks-proto/pbgo"
 )
 
 var (
