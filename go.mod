@@ -4,6 +4,7 @@ go 1.16
 
 require (
 	github.com/google/uuid v1.3.0
+	github.com/grpc-ecosystem/go-grpc-middleware v1.0.1-0.20190118093823-f849b5445de4
 	github.com/jackc/pgx/v4 v4.13.0 // indirect
 	github.com/openinfradev/tks-contract v0.1.1-0.20210902134454-132819708ac3
 	github.com/openinfradev/tks-proto v0.0.6-0.20210901093202-5e0db3fa3d4f
