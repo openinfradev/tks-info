@@ -61,9 +61,11 @@ func main() {
   InitAppInfoHandler(db)
   InitClusterInfoHandler(db)
   InitCspInfoHandler(db)
+  InitKeycloakInfoHandler(db)
   pb.RegisterAppInfoServiceServer(s, &AppInfoServer{})
   pb.RegisterClusterInfoServiceServer(s, &ClusterInfoServer{})
   pb.RegisterCspInfoServiceServer(s, &CspInfoServer{})
+  pb.RegisterKeycloakInfoServiceServer(s, &KeycloakInfoServer{})
 
   if err := s.Serve(lis); err != nil {
     log.Fatal("failed to serve: ", err)

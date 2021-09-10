@@ -38,7 +38,7 @@ func (s *CspInfoServer) CreateCSPInfo(ctx context.Context, in *pb.CreateCSPInfoR
     return &res, err
   }
 
-  id, err := cspInfoAccessor.Create(contractId, in.GetCspName(), in.GetAuth())
+  id, err := cspInfoAccessor.Create(contractId, in.GetCspName(), in.GetAuth(), in.GetCspType() )
   if err != nil {
     return &pb.IDResponse{
       Code: pb.Code_INTERNAL,
@@ -52,6 +52,43 @@ func (s *CspInfoServer) CreateCSPInfo(ctx context.Context, in *pb.CreateCSPInfoR
     Code:  pb.Code_OK_UNSPECIFIED,
     Error: nil,
     Id:    id.String(),
+  }, nil
+}
+
+// GetCSPInfo is used to get CSP Info by id.
+func (s *CspInfoServer) GetCSPInfo(ctx context.Context, in *pb.IDRequest) (*pb.GetCSPInfoResponse, error) {
+  log.Debug("request GetCSPInfo for CSP ID ", in.GetId())
+
+  cspId, err := uuid.Parse(in.GetId())
+  if err != nil {
+    res := pb.GetCSPInfoResponse{
+      Code: pb.Code_INVALID_ARGUMENT,
+      Error: &pb.Error{
+        Msg: fmt.Sprintf("invalid csp ID %s", in.GetId()),
+      },
+    }
+    return &res, err
+  }
+  fmt.Sprintf("cspInfo %s", cspId )
+
+  cspInfo, err2 := cspInfoAccessor.GetCSPInfo(cspId)
+  if err2 != nil {
+    res := pb.GetCSPInfoResponse{
+      Code: pb.Code_NOT_FOUND,
+      Error: &pb.Error{
+        Msg: err2.Error(),
+      },
+    }
+    return &res, err2
+  }
+
+  return &pb.GetCSPInfoResponse{
+    Code:  pb.Code_OK_UNSPECIFIED,
+    Error: nil,
+    ContractId: cspInfo.ContractID.String(),
+    CspName: cspInfo.Name,
+    Auth: cspInfo.Auth,
+    CspType: cspInfo.CspType,
   }, nil
 }
 
