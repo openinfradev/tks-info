@@ -2,8 +2,10 @@ package main
 
 import (
   "context"
+  "fmt"
   "gorm.io/gorm"
 
+  "github.com/google/uuid"
   "github.com/openinfradev/tks-contract/pkg/log"
   "github.com/openinfradev/tks-info/pkg/keycloak_info"
   pb "github.com/openinfradev/tks-proto/pbgo"
@@ -23,34 +25,65 @@ func InitKeycloakInfoHandler(db *gorm.DB) {
 
 func (s *KeycloakInfoServer) CreateKeycloakInfo(ctx context.Context, in *pb.CreateKeycloakInfoRequest) (*pb.IDResponse, error) {
   log.Debug("Request 'CreateKeycloakInfo' ")
-  log.Warn("Not Implemented gRPC API: 'CreateKeycloakInfo'")
+
+  clusterId, err := uuid.Parse(in.GetClusterId())
+  if err != nil {
+    res := pb.IDResponse{
+      Code: pb.Code_INVALID_ARGUMENT,
+      Error: &pb.Error{
+        Msg: fmt.Sprintf("invalid cluster ID %s", in.GetClusterId()),
+      },
+    }
+    return &res, err
+  }
+
+  id, err := keycloakInfoAccessor.Create(clusterId, in.GetRealm(), in.GetClientId(), in.GetSecret(), in.GetPrivateKey() )
+  if err != nil {
+    return &pb.IDResponse{
+      Code: pb.Code_INTERNAL,
+      Error: &pb.Error{
+        Msg: err.Error(),
+      },
+    }, err
+  }
+
   return &pb.IDResponse{
-    Code:  pb.Code_UNIMPLEMENTED,
+    Code:  pb.Code_OK_UNSPECIFIED,
     Error: nil,
+    Id:    id.String(),
   }, nil
 }
 
-func (s *KeycloakInfoServer) GetKeycloakInfos(ctx context.Context, in *pb.IDRequest) (*pb.GetKeycloakInfosResponse, error) {
-  log.Debug("Request 'GetKeycloakInfos' ")
-  log.Warn("Not Implemented gRPC API: 'GetKeycloakInfos'")
-  
-  return &pb.GetKeycloakInfosResponse{
-    Infos: nil,
-  }, nil
+func (s *KeycloakInfoServer) GetKeycloakInfoByClusterId(ctx context.Context, in *pb.IDRequest) (*pb.GetKeycloakInfoResponse, error) {
+  //log.Debug("Request 'GetKeycloakInfoByClusterId' clusterId ", in.GetClusterId() )
 
-}
+  /*
+  if in.GetClusterId() == "" {
+    return &pb.GetKeycloakInfoResponse {
+      Code:  pb.Code_INVALID_ARGUMENT,
+      Error: nil,
+    }, nil
+  }
 
-func (s *KeycloakInfoServer) GetKeycloakInfo(ctx context.Context, in *pb.GetKeycloakInfoRequest) (*pb.GetKeycloakInfoResponse, error) {
-  log.Debug("Request 'GetKeycloakInfo' ")
-  log.Warn("Not Implemented gRPC API: 'GetKeycloakInfo'")
+  keycloakInfos, err := keycloakInfoAccessor.GetKeycloakInfos(in.GetClusterId())
+  if err != nil {
+    return &pb.GetKeycloakInfoResponse {
+      Code: pb.Code_INTERNAL,
+      Error: &pb.Error{
+        Msg: fmt.Sprintf("failed to get keycloak infos. clusterId %s", in.GetClusterId() ),
+      },
+    }, err
+  }
+
   return &pb.GetKeycloakInfoResponse{
     Code:  pb.Code_OK_UNSPECIFIED,
     Error: nil,
-    ClusterId: "",
-    Realm: "",
-    ClientId: "",
-    Secret: "",
-    PrivateKey: "",
+    KeycloakInfo: keyclockInfos,
+  }, nil
+  */
+  return &pb.GetKeycloakInfoResponse{
+    Code:  pb.Code_OK_UNSPECIFIED,
+    Error: nil,
   }, nil
 }
 
