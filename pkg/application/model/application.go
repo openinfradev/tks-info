@@ -4,7 +4,7 @@ import (
 	"time"
 
 	uuid "github.com/google/uuid"
-	pb "github.com/openinfradev/tks-proto/pbgo"
+	pb "github.com/openinfradev/tks-proto/tks_pb"
 	"gorm.io/datatypes"
 	"gorm.io/gorm"
 )

@@ -9,7 +9,7 @@ import (
 
   _ "github.com/openinfradev/tks-contract/pkg/log"
   model "github.com/openinfradev/tks-info/pkg/cluster/model"
-  pb "github.com/openinfradev/tks-proto/pbgo"
+  pb "github.com/openinfradev/tks-proto/tks_pb"
 )
 
 // Accessor accesses cluster info in DB.
