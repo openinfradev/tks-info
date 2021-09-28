@@ -7,7 +7,7 @@ import (
   "gorm.io/gorm"
   "gorm.io/driver/postgres"
   "github.com/openinfradev/tks-info/pkg/cluster"
-  pb "github.com/openinfradev/tks-proto/pbgo"
+  pb "github.com/openinfradev/tks-proto/tks_pb"
 )
 
 var (

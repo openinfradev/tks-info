@@ -7,7 +7,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/openinfradev/tks-contract/pkg/log"
 	"github.com/openinfradev/tks-info/pkg/application/model"
-	pb "github.com/openinfradev/tks-proto/pbgo"
+	pb "github.com/openinfradev/tks-proto/tks_pb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"gorm.io/datatypes"
 	"gorm.io/gorm"
