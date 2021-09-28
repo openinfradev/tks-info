@@ -11,7 +11,7 @@ import (
 	"gorm.io/gorm"
 
 	"github.com/openinfradev/tks-info/pkg/application"
-	pb "github.com/openinfradev/tks-proto/pbgo"
+	pb "github.com/openinfradev/tks-proto/tks_pb"
 )
 
 var (

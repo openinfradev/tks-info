@@ -6,7 +6,7 @@ import (
   "gorm.io/gorm"
 
   model "github.com/openinfradev/tks-info/pkg/csp_info/model"
-  pb "github.com/openinfradev/tks-proto/pbgo"
+  pb "github.com/openinfradev/tks-proto/tks_pb"
 )
 
 // Accessor accesses to csp info in-memory data.
