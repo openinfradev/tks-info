@@ -20,4 +20,5 @@ require (
 )
 
 replace github.com/openinfradev/tks-info => ./
-replace github.com/openinfradev/tks-proto => ../tks-proto2
+
+replace github.com/openinfradev/tks-proto => ../tks-proto

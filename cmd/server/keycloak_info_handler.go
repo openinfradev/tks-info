@@ -55,35 +55,34 @@ func (s *KeycloakInfoServer) CreateKeycloakInfo(ctx context.Context, in *pb.Crea
 }
 
 func (s *KeycloakInfoServer) GetKeycloakInfoByClusterId(ctx context.Context, in *pb.IDRequest) (*pb.GetKeycloakInfoResponse, error) {
-  //log.Debug("Request 'GetKeycloakInfoByClusterId' clusterId ", in.GetClusterId() )
+  log.Debug("Request 'GetKeycloakInfoByClusterId' clusterId ", in.GetId() )
 
-  /*
-  if in.GetClusterId() == "" {
+  clusterId, err := uuid.Parse(in.GetId())
+  if err != nil {
     return &pb.GetKeycloakInfoResponse {
       Code:  pb.Code_INVALID_ARGUMENT,
-      Error: nil,
+      Error: &pb.Error{
+        Msg: fmt.Sprintf("invalid cluster ID %s", in.GetId()),
+      },
     }, nil
   }
 
-  keycloakInfos, err := keycloakInfoAccessor.GetKeycloakInfos(in.GetClusterId())
+  keycloakInfos, err := keycloakInfoAccessor.GetKeycloakInfos(clusterId)
   if err != nil {
     return &pb.GetKeycloakInfoResponse {
       Code: pb.Code_INTERNAL,
       Error: &pb.Error{
-        Msg: fmt.Sprintf("failed to get keycloak infos. clusterId %s", in.GetClusterId() ),
+        Msg: fmt.Sprintf("failed to get keycloak infos. clusterId %s", in.GetId() ),
       },
     }, err
   }
 
+  log.Debug( keycloakInfos )
+
   return &pb.GetKeycloakInfoResponse{
     Code:  pb.Code_OK_UNSPECIFIED,
     Error: nil,
-    KeycloakInfo: keyclockInfos,
-  }, nil
-  */
-  return &pb.GetKeycloakInfoResponse{
-    Code:  pb.Code_OK_UNSPECIFIED,
-    Error: nil,
+    KeycloakInfos: keycloakInfos,
   }, nil
 }
 

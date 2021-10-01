@@ -3,8 +3,10 @@ package keycloak_info
 import (
   "github.com/google/uuid"
   "gorm.io/gorm"
+  "fmt"
 
   model "github.com/openinfradev/tks-info/pkg/keycloak_info/model"
+  pb "github.com/openinfradev/tks-proto/tks_pb"
 )
 
 type KeycloakInfoAccessor struct {
@@ -29,20 +31,28 @@ func (x *KeycloakInfoAccessor) Create(clusterId uuid.UUID, realm string, clientI
   return keycloackInfo.Id, nil
 }
 
-/*
-func (x *KeycloakInfoAccessor) GetKeycloakInfos(clusterId uuid.UUID) ([]KeycloakInfo, error) {
+func (x *KeycloakInfoAccessor) GetKeycloakInfos(clusterId uuid.UUID) ([]*pb.KeycloakInfo, error) {
   var keycloakInfos []model.KeycloakInfo
 
-  res := x.db.Select("id").Find(&keycloakInfos, "cluster_id = ?", clusterId)
+  res := x.db.Find("cluster_id").Find(&keycloakInfos, "cluster_id = ?", clusterId)
 
   if res.RowsAffected == 0 || res.Error != nil {
-    return []string{}, fmt.Errorf("Could not find KeycloakInfo with cluster ID: %s", clusterId)
+    return []*pb.KeycloakInfo{}, fmt.Errorf("Could not find KeycloakInfo with cluster ID: %s", clusterId)
   }
 
-  var keycloakInfos []KeycloakInfo
+  pbKeycloakInfos := []*pb.KeycloakInfo{}
   for _, item := range keycloakInfos {
-    idArr = append(keycloakInfos, item.KeycloakInfo)
+    pbKeycloakInfos = append(pbKeycloakInfos, ConvertToPbKeycloakInfo(item))
   }
-  return idArr, nil
+  return pbKeycloakInfos, nil
 }
-*/
+
+func ConvertToPbKeycloakInfo(keycloakInfo model.KeycloakInfo) *pb.KeycloakInfo {
+  return &pb.KeycloakInfo{
+    ClusterId: keycloakInfo.ClusterId.String(),
+    Realm:  keycloakInfo.Realm,
+    ClientId:  keycloakInfo.ClientId,
+    Secret:     keycloakInfo.Secret,
+    PrivateKey: keycloakInfo.PrivateKey,
+  }
+}
