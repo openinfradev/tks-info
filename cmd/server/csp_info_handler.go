@@ -35,7 +35,7 @@ func (s *CspInfoServer) CreateCSPInfo(ctx context.Context, in *pb.CreateCSPInfoR
         Msg: fmt.Sprintf("invalid contract ID %s", in.GetContractId()),
       },
     }
-    return &res, err
+    return &res, nil
   }
 
   id, err := cspInfoAccessor.Create(contractId, in.GetCspName(), in.GetAuth(), in.GetCspType() )
@@ -45,7 +45,7 @@ func (s *CspInfoServer) CreateCSPInfo(ctx context.Context, in *pb.CreateCSPInfoR
       Error: &pb.Error{
         Msg: err.Error(),
       },
-    }, err
+    }, nil
   }
 
   return &pb.IDResponse{
@@ -61,25 +61,22 @@ func (s *CspInfoServer) GetCSPInfo(ctx context.Context, in *pb.IDRequest) (*pb.G
 
   cspId, err := uuid.Parse(in.GetId())
   if err != nil {
-    res := pb.GetCSPInfoResponse{
+    return &pb.GetCSPInfoResponse{
       Code: pb.Code_INVALID_ARGUMENT,
       Error: &pb.Error{
         Msg: fmt.Sprintf("invalid csp ID %s", in.GetId()),
       },
-    }
-    return &res, err
+    }, nil
   }
-  fmt.Sprintf("cspInfo %s", cspId )
 
   cspInfo, err2 := cspInfoAccessor.GetCSPInfo(cspId)
   if err2 != nil {
-    res := pb.GetCSPInfoResponse{
+    return &pb.GetCSPInfoResponse{
       Code: pb.Code_NOT_FOUND,
       Error: &pb.Error{
         Msg: err2.Error(),
       },
-    }
-    return &res, err2
+    }, nil
   }
 
   return &pb.GetCSPInfoResponse{
