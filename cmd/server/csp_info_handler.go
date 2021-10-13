@@ -57,7 +57,7 @@ func (s *CspInfoServer) CreateCSPInfo(ctx context.Context, in *pb.CreateCSPInfoR
 
 // GetCSPInfo is used to get CSP Info by id.
 func (s *CspInfoServer) GetCSPInfo(ctx context.Context, in *pb.IDRequest) (*pb.GetCSPInfoResponse, error) {
-  log.Debug("request GetCSPInfo for CSP ID ", in.GetId())
+  log.Info("request GetCSPInfo for CSP ID ", in.GetId())
 
   cspId, err := uuid.Parse(in.GetId())
   if err != nil {
@@ -91,7 +91,7 @@ func (s *CspInfoServer) GetCSPInfo(ctx context.Context, in *pb.IDRequest) (*pb.G
 
 // GetCSPIDsByContractID returns the CSP ids by the contract id.
 func (s *CspInfoServer) GetCSPIDsByContractID(ctx context.Context, in *pb.IDRequest) (*pb.IDsResponse, error) {
-  log.Debug("request GetCSPIDsByContractID for contract ID ", in.GetId())
+  log.Info("request GetCSPIDsByContractID for contract ID ", in.GetId())
 
   contractId, err := uuid.Parse(in.GetId())
   if err != nil {
@@ -125,7 +125,7 @@ func (s *CspInfoServer) GetCSPIDsByContractID(ctx context.Context, in *pb.IDRequ
 
 // UpdateCSPAuth updates an authentication config for CSP.
 func (s *CspInfoServer) UpdateCSPAuth(ctx context.Context, in *pb.UpdateCSPAuthRequest) (*pb.SimpleResponse, error) {
-  log.Debug("request UpdateCSPAuth for CSP ID ", in.GetCspId())
+  log.Info("request UpdateCSPAuth for CSP ID ", in.GetCspId())
 
   cspId, err := uuid.Parse(in.GetCspId())
   if err != nil {
@@ -155,7 +155,7 @@ func (s *CspInfoServer) UpdateCSPAuth(ctx context.Context, in *pb.UpdateCSPAuthR
 
 // GetCSPAuth returns an authentication info by csp id.
 func (s *CspInfoServer) GetCSPAuth(ctx context.Context, in *pb.IDRequest) (*pb.GetCSPAuthResponse, error) {
-  log.Debug("request GetCSPAuth for CSP ID ", in.GetId())
+  log.Info("request GetCSPAuth for CSP ID ", in.GetId())
 
   cspId, err := uuid.Parse(in.GetId())
   if err != nil {
