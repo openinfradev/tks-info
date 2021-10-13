@@ -28,13 +28,12 @@ func (s *KeycloakInfoServer) CreateKeycloakInfo(ctx context.Context, in *pb.Crea
 
   clusterId, err := uuid.Parse(in.GetClusterId())
   if err != nil {
-    res := pb.IDResponse{
+    return &pb.IDResponse{
       Code: pb.Code_INVALID_ARGUMENT,
       Error: &pb.Error{
         Msg: fmt.Sprintf("invalid cluster ID %s", in.GetClusterId()),
       },
-    }
-    return &res, nil
+    }, nil
   }
 
   id, err := keycloakInfoAccessor.Create(clusterId, in.GetRealm(), in.GetClientId(), in.GetSecret(), in.GetPrivateKey() )
