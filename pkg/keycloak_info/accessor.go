@@ -34,7 +34,7 @@ func (x *KeycloakInfoAccessor) Create(clusterId uuid.UUID, realm string, clientI
 func (x *KeycloakInfoAccessor) GetKeycloakInfos(clusterId uuid.UUID) ([]*pb.KeycloakInfo, error) {
   var keycloakInfos []model.KeycloakInfo
 
-  res := x.db.Find("cluster_id").Find(&keycloakInfos, "cluster_id = ?", clusterId)
+  res := x.db.Find(&keycloakInfos, "cluster_id = ?", clusterId)
 
   if res.RowsAffected == 0 || res.Error != nil {
     return []*pb.KeycloakInfo{}, fmt.Errorf("Could not find KeycloakInfo with cluster ID: %s", clusterId)

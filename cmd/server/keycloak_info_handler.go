@@ -24,7 +24,7 @@ func InitKeycloakInfoHandler(db *gorm.DB) {
 }
 
 func (s *KeycloakInfoServer) CreateKeycloakInfo(ctx context.Context, in *pb.CreateKeycloakInfoRequest) (*pb.IDResponse, error) {
-  log.Debug("Request 'CreateKeycloakInfo' ")
+  log.Info("Request 'CreateKeycloakInfo' ")
 
   clusterId, err := uuid.Parse(in.GetClusterId())
   if err != nil {
@@ -34,7 +34,7 @@ func (s *KeycloakInfoServer) CreateKeycloakInfo(ctx context.Context, in *pb.Crea
         Msg: fmt.Sprintf("invalid cluster ID %s", in.GetClusterId()),
       },
     }
-    return &res, err
+    return &res, nil
   }
 
   id, err := keycloakInfoAccessor.Create(clusterId, in.GetRealm(), in.GetClientId(), in.GetSecret(), in.GetPrivateKey() )
@@ -44,7 +44,7 @@ func (s *KeycloakInfoServer) CreateKeycloakInfo(ctx context.Context, in *pb.Crea
       Error: &pb.Error{
         Msg: err.Error(),
       },
-    }, err
+    }, nil
   }
 
   return &pb.IDResponse{
@@ -55,14 +55,14 @@ func (s *KeycloakInfoServer) CreateKeycloakInfo(ctx context.Context, in *pb.Crea
 }
 
 func (s *KeycloakInfoServer) GetKeycloakInfoByClusterId(ctx context.Context, in *pb.IDRequest) (*pb.GetKeycloakInfoResponse, error) {
-  log.Debug("Request 'GetKeycloakInfoByClusterId' clusterId ", in.GetId() )
+  log.Info("Request 'GetKeycloakInfoByClusterId' clusterId ", in.GetId() )
 
   clusterId, err := uuid.Parse(in.GetId())
   if err != nil {
     return &pb.GetKeycloakInfoResponse {
       Code:  pb.Code_INVALID_ARGUMENT,
       Error: &pb.Error{
-        Msg: fmt.Sprintf("invalid cluster ID %s", in.GetId()),
+        Msg: fmt.Sprintf("Invalid cluster ID %s", in.GetId()),
       },
     }, nil
   }
@@ -72,12 +72,10 @@ func (s *KeycloakInfoServer) GetKeycloakInfoByClusterId(ctx context.Context, in 
     return &pb.GetKeycloakInfoResponse {
       Code: pb.Code_INTERNAL,
       Error: &pb.Error{
-        Msg: fmt.Sprintf("failed to get keycloak infos. clusterId %s", in.GetId() ),
+        Msg: fmt.Sprintf("Failed to get keycloak infos. err : %s", err.Error() ),
       },
-    }, err
+    }, nil
   }
-
-  log.Debug( keycloakInfos )
 
   return &pb.GetKeycloakInfoResponse{
     Code:  pb.Code_OK_UNSPECIFIED,
@@ -87,7 +85,7 @@ func (s *KeycloakInfoServer) GetKeycloakInfoByClusterId(ctx context.Context, in 
 }
 
 func (s *KeycloakInfoServer) UpdateKeycloakInfo(ctx context.Context, in *pb.IDRequest) (*pb.SimpleResponse, error) {
-  log.Debug("Request 'UpdateKeycloakInfo' ")
+  log.Info("Request 'UpdateKeycloakInfo' ")
   log.Warn("Not Implemented gRPC API: 'UpdateKeycloakInfo'")
   return &pb.SimpleResponse{
     Code:  pb.Code_UNIMPLEMENTED,
@@ -96,7 +94,7 @@ func (s *KeycloakInfoServer) UpdateKeycloakInfo(ctx context.Context, in *pb.IDRe
 }
 
 func (s *KeycloakInfoServer) DeleteKeycloakInfo(ctx context.Context, in *pb.IDRequest) (*pb.SimpleResponse, error) {
-  log.Debug("Request 'DeleteKeycloakInfo' ")
+  log.Info("Request 'DeleteKeycloakInfo' ")
   log.Warn("Not Implemented gRPC API: 'DeleteKeycloakInfo'")
   return &pb.SimpleResponse{
     Code:  pb.Code_UNIMPLEMENTED,
