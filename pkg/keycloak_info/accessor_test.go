@@ -25,7 +25,7 @@ func init() {
 }
 
 func TestCreateKeycloakInfo(t *testing.T) {
-  _, err := keycloakInfoAccessor.Create(clusterId, "realm", "clientId", "secret", "privatekey")
+  Id, err = keycloakInfoAccessor.Create(clusterId, "realm", "clientId", "secret", "privatekey")
   if err != nil {
     t.Errorf("An error occurred while creating new cspInfo. Err: %s", err)
   }
