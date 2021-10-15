@@ -17,6 +17,7 @@ var (
 	conn *grpc.ClientConn
 	clusterInfoClient pb.ClusterInfoServiceClient
 	cspInfoClient pb.CspInfoServiceClient
+	appInfoClient pb.AppInfoServiceClient
 )
 
 func RequestLogging() grpc.UnaryClientInterceptor {
@@ -69,4 +70,14 @@ func GetCspInfoClient(address string, port int, caller string) (pb.CspInfoServic
 
 	cspInfoClient = pb.NewCspInfoServiceClient(conn)
 	return cspInfoClient, nil
+}
+
+func GetAppInfoClient(address string, port int, caller string) (pb.AppInfoServiceClient, error) {
+	conn, err := GetConnection( fmt.Sprintf("%s:%d", address, port) )
+	if err != nil {
+		return nil, err
+	}
+
+	appInfoClient = pb.NewAppInfoServiceClient(conn)
+	return appInfoClient, nil
 }

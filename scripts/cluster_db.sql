@@ -1,3 +1,4 @@
+\c tks;
 CREATE TABLE clusters
 (
     name character varying(50) COLLATE pg_catalog."default",
@@ -13,6 +14,7 @@ CREATE TABLE clusters
     worker_root_size bigint,
     k8s_version character varying(50) COLLATE pg_catalog."default",
     kubeconfig character varying(1000) COLLATE pg_catalog."default",
+    region character varying(50) COLLATE pg_catalog."default",
     updated_at timestamp with time zone,
     created_at timestamp with time zone
 );

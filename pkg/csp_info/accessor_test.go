@@ -25,7 +25,7 @@ func init() {
 }
 
 func TestCreateCSPInfo(t *testing.T) {
-  cspId, err = cspInfoAccessor.Create(contractId, "dummy", "DUMMYAUTH")
+  cspId, err = cspInfoAccessor.Create(contractId, "dummy", "DUMMYAUTH", 0)
   if err != nil {
     t.Errorf("An error occurred while creating new cspInfo. Err: %s", err)
   }
