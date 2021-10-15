@@ -21,11 +21,11 @@ func init() {
   keycloakInfoAccessor = keycloak_info.New(db)
 
   // Create contract in advance for test cases
-  clsuterId = uuid.New()
+  clusterId = uuid.New()
 }
 
 func TestCreateKeycloakInfo(t *testing.T) {
-  id, err = keycloakInfoAccessor.Create(clusterId, "dummy", "DUMMYAUTH")
+  _, err := keycloakInfoAccessor.Create(clusterId, "realm", "clientId", "secret", "privatekey")
   if err != nil {
     t.Errorf("An error occurred while creating new cspInfo. Err: %s", err)
   }
