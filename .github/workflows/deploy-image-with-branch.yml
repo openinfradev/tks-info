@@ -1,8 +1,11 @@
 name: Create and publish a package
 on:
-  pull_request:
+  push:
+    tags:
+      - v*
     branches:
       - main
+  pull_request:
 jobs:
   build-and-push-image:
     runs-on: ubuntu-latest
@@ -25,7 +28,7 @@ jobs:
       with:
         push: true
         tags: |
-          sktcloud/tks-info:${{ github.sha::8 }}, 
+          sktcloud/tks-info:${{ github.head_ref }}-${{ github.sha::8 }}, 
           sktcloud/tks-info:latest
         build-args: |
           PRV_GITHUB_TOKEN=${{ secrets.PRV_GITHUB_TOKEN }}
