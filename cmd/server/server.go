@@ -27,7 +27,7 @@ var (
 )
 
 func main() {
-  log.Info("tksinfo server is starting...")
+  log.Info("tksinfo server is starting....")
   flag.Parse()
 
   addr := fmt.Sprintf(":%d", *port)
