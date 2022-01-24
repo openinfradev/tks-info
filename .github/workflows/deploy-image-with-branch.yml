@@ -24,6 +24,8 @@ jobs:
       uses: docker/build-push-action@v2
       with:
         push: true
-        tags: seungkyua/tks-info:${{ github.sha }}
+        tags: |
+          sktcloud/tks-info:${{ github.head_ref }}-${{ github.sha }}
+          sktcloud/tks-info:latest
         build-args: |
           PRV_GITHUB_TOKEN=${{ secrets.PRV_GITHUB_TOKEN }}
