@@ -27,7 +27,7 @@ func New(db *gorm.DB) *Accessor {
 
 // Create creates a new application group in database.
 func (x *Accessor) Create(clusterID uuid.UUID, appGroup *pb.AppGroup) (uuid.UUID, error) {
-	existsLabel, err := x.existsExternalLabel(clusterID, appGroup.GetExternalLabel())
+	existsLabel, err := x.existsExternalLabel(clusterID, appGroup.GetType(), appGroup.GetExternalLabel())
 	if err != nil {
 		return uuid.Nil, err
 	}
@@ -221,12 +221,12 @@ func reflectToPbApplication(model model.Application) *pb.Application {
 	}
 }
 
-func (x *Accessor) existsExternalLabel(clusterID uuid.UUID, label string) (bool, error) {
+func (x *Accessor) existsExternalLabel(clusterID uuid.UUID, appGroupType pb.AppGroupType, label string) (bool, error) {
 	if label == "" {
 		return false, nil
 	}
 	var appGroup model.ApplicationGroup
-	res := x.db.First(&appGroup, "cluster_id = ? AND external_label = ?", clusterID, label)
+	res := x.db.First(&appGroup, "cluster_id = ? AND type = ? AND external_label = ?", clusterID, appGroupType, label)
 	if errors.Is(res.Error, gorm.ErrRecordNotFound) {
 		return false, nil
 	} else if res.Error != nil {
