@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"time"
 
-	"google.golang.org/grpc"
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
+	"google.golang.org/grpc"
 	//"google.golang.org/grpc/credentials"
 
 	"github.com/openinfradev/tks-contract/pkg/log"
@@ -14,10 +14,10 @@ import (
 )
 
 var (
-	conn *grpc.ClientConn
+	conn              *grpc.ClientConn
 	clusterInfoClient pb.ClusterInfoServiceClient
-	cspInfoClient pb.CspInfoServiceClient
-	appInfoClient pb.AppInfoServiceClient
+	cspInfoClient     pb.CspInfoServiceClient
+	appInfoClient     pb.AppInfoServiceClient
 )
 
 func RequestLogging() grpc.UnaryClientInterceptor {
@@ -28,7 +28,7 @@ func RequestLogging() grpc.UnaryClientInterceptor {
 
 		log.Info(fmt.Sprintf("[GRPC:%s][START:%s][END:%s][ERR:%v]", method, start.Format(time.RFC3339), end.Format(time.RFC3339), err))
 		log.Debug(fmt.Sprintf("[GRPC:%s][REQUEST %s][REPLY %s]", method, req, reply))
-		
+
 		return err
 	}
 }
@@ -48,22 +48,22 @@ func GetConnection(host string) (*grpc.ClientConn, error) {
 			return nil, err
 		}
 		conn = _conn
-	} 
+	}
 	return conn, nil
 }
 
 func GetClusterInfoClient(address string, port int, caller string) (pb.ClusterInfoServiceClient, error) {
-	conn, err := GetConnection( fmt.Sprintf("%s:%d", address, port) )
+	conn, err := GetConnection(fmt.Sprintf("%s:%d", address, port))
 	if err != nil {
 		return nil, err
-	} 
+	}
 
 	clusterInfoClient = pb.NewClusterInfoServiceClient(conn)
 	return clusterInfoClient, nil
 }
 
 func GetCspInfoClient(address string, port int, caller string) (pb.CspInfoServiceClient, error) {
-	conn, err := GetConnection( fmt.Sprintf("%s:%d", address, port) )
+	conn, err := GetConnection(fmt.Sprintf("%s:%d", address, port))
 	if err != nil {
 		return nil, err
 	}
@@ -73,7 +73,7 @@ func GetCspInfoClient(address string, port int, caller string) (pb.CspInfoServic
 }
 
 func GetAppInfoClient(address string, port int, caller string) (pb.AppInfoServiceClient, error) {
-	conn, err := GetConnection( fmt.Sprintf("%s:%d", address, port) )
+	conn, err := GetConnection(fmt.Sprintf("%s:%d", address, port))
 	if err != nil {
 		return nil, err
 	}
