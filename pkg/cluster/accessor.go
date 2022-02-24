@@ -128,6 +128,7 @@ func ConvertToPbCluster(cluster model.Cluster) *pb.Cluster {
 		UpdatedAt:  timestamppb.New(cluster.CreatedAt),
 		Status:     cluster.Status,
 		ContractId: cluster.ContractID.String(),
+		CspId:      cluster.CspID.String(),
 		Kubeconfig: cluster.Kubeconfig,
 		Conf:       &tempConf,
 	}
