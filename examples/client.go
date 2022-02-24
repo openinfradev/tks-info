@@ -15,14 +15,14 @@ import (
 )
 
 var (
-	port       = flag.Int("port", 9111, "The gRPC server port")
-	tls        = flag.Bool("tls", false, "Connection uses TLS if true, else plain TCP")
-	caFile     = flag.String("ca_file", "", "The TLS ca file")
-	contractID = uuid.New().String()
-	cspID      = uuid.New().String()
-	clusterID  string
-	appGroupID string
-	clusterName       = "testCluster"
+	port        = flag.Int("port", 9111, "The gRPC server port")
+	tls         = flag.Bool("tls", false, "Connection uses TLS if true, else plain TCP")
+	caFile      = flag.String("ca_file", "", "The TLS ca file")
+	contractID  = uuid.New().String()
+	cspID       = uuid.New().String()
+	clusterID   string
+	appGroupID  string
+	clusterName = "testCluster"
 )
 
 func main() {
@@ -66,20 +66,20 @@ func doCreateCluster(cc *grpc.ClientConn) {
 	c := pb.NewClusterInfoServiceClient(cc)
 
 	dummyConf := pb.ClusterConf{
-		MasterFlavor: "tiny",
+		MasterFlavor:   "tiny",
 		MasterReplicas: 3,
 		MasterRootSize: 50,
-		WorkerFlavor: "medium",
+		WorkerFlavor:   "medium",
 		WorkerReplicas: 5,
 		WorkerRootSize: 50,
-		K8SVersion: "1.18.8",
+		K8SVersion:     "1.18.8",
 	}
 
 	req := &pb.AddClusterInfoRequest{
 		ContractId: contractID,
-		CspId: cspID,
-		Name: clusterName,
-		Conf: &dummyConf,
+		CspId:      cspID,
+		Name:       clusterName,
+		Conf:       &dummyConf,
 	}
 
 	res, err := c.AddClusterInfo(context.Background(), req)
