@@ -10,7 +10,7 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 
-	"github.com/openinfradev/tks-contract/pkg/log"
+	"github.com/openinfradev/tks-common/pkg/log"
 	"github.com/openinfradev/tks-info/pkg/cert"
 	pb "github.com/openinfradev/tks-proto/tks_pb"
 )

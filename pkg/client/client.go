@@ -9,7 +9,7 @@ import (
 	"google.golang.org/grpc"
 	//"google.golang.org/grpc/credentials"
 
-	"github.com/openinfradev/tks-contract/pkg/log"
+	"github.com/openinfradev/tks-common/pkg/log"
 	pb "github.com/openinfradev/tks-proto/tks_pb"
 )
 

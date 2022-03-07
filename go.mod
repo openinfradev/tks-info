@@ -5,18 +5,22 @@ go 1.16
 require (
 	github.com/google/uuid v1.3.0
 	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0
-	github.com/openinfradev/tks-contract v0.1.1-0.20210928021110-fe2b666327cc
-	github.com/openinfradev/tks-proto v0.0.6-0.20211015003551-ed8f9541f40d
+	github.com/jackc/pgx/v4 v4.15.0 // indirect
+	github.com/openinfradev/tks-common v0.0.0-20220210005751-57d957152e7b
+	github.com/openinfradev/tks-proto v0.0.6-0.20220304011855-99ac351f420f
 	github.com/stretchr/testify v1.7.0
-	golang.org/x/crypto v0.0.0-20210921155107-089bfa567519 // indirect
-	golang.org/x/net v0.0.0-20211011170408-caeb26a5c8c0 // indirect
-	golang.org/x/sys v0.0.0-20211013075003-97ac67df715c // indirect
-	google.golang.org/genproto v0.0.0-20211013025323-ce878158c4d4 // indirect
-	google.golang.org/grpc v1.41.0
+	golang.org/x/crypto v0.0.0-20220210151621-f4118a5b28e2 // indirect
+	golang.org/x/net v0.0.0-20220127200216-cd36cc0744dd // indirect
+	golang.org/x/sys v0.0.0-20220209214540-3681064d5158 // indirect
+	google.golang.org/genproto v0.0.0-20220211171837-173942840c17 // indirect
+	google.golang.org/grpc v1.44.0
 	google.golang.org/protobuf v1.27.1
-	gorm.io/datatypes v1.0.2
-	gorm.io/driver/postgres v1.1.2
-	gorm.io/gorm v1.21.16
+	gorm.io/datatypes v1.0.5
+	gorm.io/driver/mysql v1.2.3 // indirect
+	gorm.io/driver/postgres v1.2.3
+	gorm.io/driver/sqlite v1.1.4 // indirect
+	gorm.io/driver/sqlserver v1.0.9 // indirect
+	gorm.io/gorm v1.22.5
 )
 
 replace github.com/openinfradev/tks-info => ./

@@ -4,12 +4,13 @@ import (
 	"context"
 	"fmt"
 
+	"gorm.io/gorm"
 	"github.com/google/uuid"
-	"github.com/openinfradev/tks-contract/pkg/log"
+
+	"github.com/openinfradev/tks-common/pkg/log"
 	"github.com/openinfradev/tks-info/pkg/application"
 	app "github.com/openinfradev/tks-info/pkg/application"
 	pb "github.com/openinfradev/tks-proto/tks_pb"
-	"gorm.io/gorm"
 )
 
 var acc *app.Accessor

@@ -7,7 +7,7 @@ import (
 	"gorm.io/gorm"
 	_ "time"
 
-	_ "github.com/openinfradev/tks-contract/pkg/log"
+	_ "github.com/openinfradev/tks-common/pkg/log"
 	model "github.com/openinfradev/tks-info/pkg/cluster/model"
 	pb "github.com/openinfradev/tks-proto/tks_pb"
 )

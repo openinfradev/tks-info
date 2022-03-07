@@ -3,6 +3,7 @@ package application_test
 import (
 	"fmt"
 	"math/rand"
+	"os"
 	"testing"
 	"time"
 
@@ -10,7 +11,11 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 
+	"github.com/openinfradev/tks-common/pkg/helper"
+	"github.com/openinfradev/tks-common/pkg/log"
+
 	"github.com/openinfradev/tks-info/pkg/application"
+	"github.com/openinfradev/tks-info/pkg/application/model"
 	pb "github.com/openinfradev/tks-proto/tks_pb"
 )
 
@@ -21,12 +26,57 @@ var (
 	accessor   *application.Accessor
 )
 
+var (
+	testDBHost string
+	testDBPort string
+)
+
 func init() {
 	clusterID = uuid.New()
-	dsn := "host=localhost user=postgres password=password dbname=tks port=5432 sslmode=disable TimeZone=Asia/Seoul"
-	db, _ := gorm.Open(postgres.Open(dsn), &gorm.Config{})
-	accessor = application.New(db)
+
+	log.Disable()
 }
+
+func getAccessor() (*application.Accessor, error) {
+	dsn := fmt.Sprintf(
+		"host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Asia/Seoul",
+		testDBHost, "postgres", "password", "tks", testDBPort)
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	if err != nil {
+		return nil, err
+	}
+
+	db.Exec(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`)
+
+	if err := db.AutoMigrate(&model.Application{}); err != nil {
+		return nil, err
+	}
+	if err := db.AutoMigrate(&model.ApplicationGroup{}); err != nil {
+		return nil, err
+	}
+
+	return application.New(db), nil
+}
+
+func TestMain(m *testing.M) {
+	pool, resource, err := helper.CreatePostgres()
+	if err != nil {
+		fmt.Printf("Could not create postgres: %s", err)
+		os.Exit(-1)
+	}
+	testDBHost, testDBPort = helper.GetHostAndPort(resource)
+	_accessor, err := getAccessor()
+	accessor = _accessor
+
+	code := m.Run()
+
+	if err := helper.RemovePostgres(pool, resource); err != nil {
+		fmt.Printf("Could not remove postgres: %s", err)
+		os.Exit(-1)
+	}
+	os.Exit(code)
+}
+
 func TestCreateApplicationGroup(t *testing.T) {
 	var err error
 	appName = getRandomString("gotest")
