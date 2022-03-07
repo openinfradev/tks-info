@@ -65,8 +65,7 @@ func TestMain(m *testing.M) {
 		os.Exit(-1)
 	}
 	testDBHost, testDBPort = helper.GetHostAndPort(resource)
-	_accessor, err := getAccessor()
-	accessor = _accessor
+	accessor, _ = getAccessor()
 
 	code := m.Run()
 

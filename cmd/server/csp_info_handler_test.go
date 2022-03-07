@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	createdCspInfoId string
+	createdCspInfoId     string
 	requestCreateCSPInfo *pb.CreateCSPInfoRequest
 )
 
@@ -43,8 +43,8 @@ func TestCreateCSPInfo(t *testing.T) {
 		},
 		{
 			name: "INVALID_CONTRACT_ID",
-			in:   &pb.CreateCSPInfoRequest{
-				ContractId : "THIS_IS_NOT_UUID",
+			in: &pb.CreateCSPInfoRequest{
+				ContractId: "THIS_IS_NOT_UUID",
 			},
 			checkResponse: func(req *pb.CreateCSPInfoRequest, res *pb.IDResponse, err error) {
 				require.Error(t, err)
@@ -83,7 +83,7 @@ func TestGetCSPInfo(t *testing.T) {
 	}{
 		{
 			name: "OK",
-			in:   &pb.IDRequest{
+			in: &pb.IDRequest{
 				Id: createdCspInfoId,
 			},
 			checkResponse: func(req *pb.IDRequest, res *pb.GetCSPInfoResponse, err error) {
@@ -98,8 +98,8 @@ func TestGetCSPInfo(t *testing.T) {
 		},
 		{
 			name: "INVALID_CSP_ID",
-			in:   &pb.IDRequest{
-				Id : "THIS_IS_NOT_UUID",
+			in: &pb.IDRequest{
+				Id: "THIS_IS_NOT_UUID",
 			},
 			checkResponse: func(req *pb.IDRequest, res *pb.GetCSPInfoResponse, err error) {
 				require.Error(t, err)
@@ -108,8 +108,8 @@ func TestGetCSPInfo(t *testing.T) {
 		},
 		{
 			name: "NOT_EXIST_CSP_ID",
-			in:   &pb.IDRequest{
-				Id : uuid.New().String(),
+			in: &pb.IDRequest{
+				Id: uuid.New().String(),
 			},
 			checkResponse: func(req *pb.IDRequest, res *pb.GetCSPInfoResponse, err error) {
 				require.Error(t, err)
@@ -140,7 +140,7 @@ func TestGetCSPIDsByContractID(t *testing.T) {
 	}{
 		{
 			name: "OK",
-			in:   &pb.IDRequest{
+			in: &pb.IDRequest{
 				Id: requestCreateCSPInfo.GetContractId(),
 			},
 			checkResponse: func(req *pb.IDRequest, res *pb.IDsResponse, err error) {
@@ -152,8 +152,8 @@ func TestGetCSPIDsByContractID(t *testing.T) {
 		},
 		{
 			name: "INVALID_CONTRACT_ID",
-			in:   &pb.IDRequest{
-				Id : "THIS_IS_NOT_UUID",
+			in: &pb.IDRequest{
+				Id: "THIS_IS_NOT_UUID",
 			},
 			checkResponse: func(req *pb.IDRequest, res *pb.IDsResponse, err error) {
 				require.Error(t, err)
@@ -162,8 +162,8 @@ func TestGetCSPIDsByContractID(t *testing.T) {
 		},
 		{
 			name: "NOT_EXIST_CONTRACT_ID",
-			in:   &pb.IDRequest{
-				Id : uuid.New().String(),
+			in: &pb.IDRequest{
+				Id: uuid.New().String(),
 			},
 			checkResponse: func(req *pb.IDRequest, res *pb.IDsResponse, err error) {
 				require.Error(t, err)
@@ -194,9 +194,9 @@ func TestUpdateCSPAuth(t *testing.T) {
 	}{
 		{
 			name: "OK",
-			in:   &pb.UpdateCSPAuthRequest{
+			in: &pb.UpdateCSPAuthRequest{
 				CspId: createdCspInfoId,
-				Auth: "updated_pem",
+				Auth:  "updated_pem",
 			},
 			checkResponse: func(req *pb.UpdateCSPAuthRequest, res *pb.SimpleResponse, err error) {
 				require.NoError(t, err)
@@ -207,8 +207,8 @@ func TestUpdateCSPAuth(t *testing.T) {
 		},
 		{
 			name: "INVALID_CSP_ID",
-			in:   &pb.UpdateCSPAuthRequest{
-				CspId : "THIS_IS_NOT_UUID",
+			in: &pb.UpdateCSPAuthRequest{
+				CspId: "THIS_IS_NOT_UUID",
 			},
 			checkResponse: func(req *pb.UpdateCSPAuthRequest, res *pb.SimpleResponse, err error) {
 				require.Error(t, err)
@@ -217,8 +217,8 @@ func TestUpdateCSPAuth(t *testing.T) {
 		},
 		{
 			name: "NOT_EXIST_CSP_ID",
-			in:   &pb.UpdateCSPAuthRequest{
-				CspId : uuid.New().String(),
+			in: &pb.UpdateCSPAuthRequest{
+				CspId: uuid.New().String(),
 			},
 			checkResponse: func(req *pb.UpdateCSPAuthRequest, res *pb.SimpleResponse, err error) {
 				require.Error(t, err)
@@ -249,20 +249,20 @@ func TestGetCSPAuth(t *testing.T) {
 	}{
 		{
 			name: "OK",
-			in:   &pb.IDRequest{
+			in: &pb.IDRequest{
 				Id: createdCspInfoId,
 			},
 			checkResponse: func(req *pb.IDRequest, res *pb.GetCSPAuthResponse, err error) {
 				require.NoError(t, err)
 				require.Equal(t, res.Code, pb.Code_OK_UNSPECIFIED)
 
-				require.Equal(t, requestCreateCSPInfo.GetAuth(), res.GetAuth() )
+				require.Equal(t, requestCreateCSPInfo.GetAuth(), res.GetAuth())
 			},
 		},
 		{
 			name: "INVALID_CSP_ID",
-			in:   &pb.IDRequest{
-				Id : "THIS_IS_NOT_UUID",
+			in: &pb.IDRequest{
+				Id: "THIS_IS_NOT_UUID",
 			},
 			checkResponse: func(req *pb.IDRequest, res *pb.GetCSPAuthResponse, err error) {
 				require.Error(t, err)
@@ -271,8 +271,8 @@ func TestGetCSPAuth(t *testing.T) {
 		},
 		{
 			name: "NOT_EXIST_CSP_ID",
-			in:   &pb.IDRequest{
-				Id : uuid.New().String(),
+			in: &pb.IDRequest{
+				Id: uuid.New().String(),
 			},
 			checkResponse: func(req *pb.IDRequest, res *pb.GetCSPAuthResponse, err error) {
 				require.Error(t, err)
@@ -295,14 +295,13 @@ func TestGetCSPAuth(t *testing.T) {
 	}
 }
 
-
 // Helpers
 
 func randomCreateCSPInfoRequest() *pb.CreateCSPInfoRequest {
 	return &pb.CreateCSPInfoRequest{
-		ContractId : uuid.New().String(),
-		CspName : randomString("cspname"),
-		Auth : "premkey",
-		CspType : pb.CspType_AWS,
+		ContractId: uuid.New().String(),
+		CspName:    randomString("cspname"),
+		Auth:       "premkey",
+		CspType:    pb.CspType_AWS,
 	}
 }

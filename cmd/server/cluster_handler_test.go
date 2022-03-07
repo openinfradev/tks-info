@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	createdClusterId  string
+	createdClusterId      string
 	requestAddClusterInfo *pb.AddClusterInfoRequest
 )
 
@@ -49,7 +49,7 @@ func TestAddClusterInfo(t *testing.T) {
 		},
 		{
 			name: "INVALID_CONTRACT_ID",
-			in:   &pb.AddClusterInfoRequest{
+			in: &pb.AddClusterInfoRequest{
 				ContractId: "NO_UUID_STRING",
 			},
 			checkResponse: func(req *pb.AddClusterInfoRequest, res *pb.IDResponse, err error) {
@@ -59,7 +59,7 @@ func TestAddClusterInfo(t *testing.T) {
 		},
 		{
 			name: "INVALID_CSP_ID",
-			in:   &pb.AddClusterInfoRequest{
+			in: &pb.AddClusterInfoRequest{
 				ContractId: "NO_UUID_STRING",
 			},
 			checkResponse: func(req *pb.AddClusterInfoRequest, res *pb.IDResponse, err error) {
@@ -69,9 +69,9 @@ func TestAddClusterInfo(t *testing.T) {
 		},
 		{
 			name: "NOT_EXISTED_CSP_ID",
-			in:   &pb.AddClusterInfoRequest{
+			in: &pb.AddClusterInfoRequest{
 				ContractId: requestAddClusterInfo.ContractId,
-				CspId: uuid.New().String(),
+				CspId:      uuid.New().String(),
 			},
 			checkResponse: func(req *pb.AddClusterInfoRequest, res *pb.IDResponse, err error) {
 				require.Error(t, err)
@@ -102,22 +102,22 @@ func TestGetCluster(t *testing.T) {
 	}{
 		{
 			name: "OK",
-			in:   &pb.GetClusterRequest{
+			in: &pb.GetClusterRequest{
 				ClusterId: createdClusterId,
 			},
 			checkResponse: func(req *pb.GetClusterRequest, res *pb.GetClusterResponse, err error) {
 				require.NoError(t, err)
 				require.Equal(t, res.Code, pb.Code_OK_UNSPECIFIED)
 
-				require.Equal(t, res.Cluster.Id, createdClusterId )
-				require.Equal(t, res.Cluster.ContractId, requestAddClusterInfo.ContractId )
-				require.Equal(t, res.Cluster.Name, requestAddClusterInfo.Name )
-				require.Equal(t, res.Cluster.Status, pb.ClusterStatus_UNSPECIFIED )
+				require.Equal(t, res.Cluster.Id, createdClusterId)
+				require.Equal(t, res.Cluster.ContractId, requestAddClusterInfo.ContractId)
+				require.Equal(t, res.Cluster.Name, requestAddClusterInfo.Name)
+				require.Equal(t, res.Cluster.Status, pb.ClusterStatus_UNSPECIFIED)
 			},
 		},
 		{
 			name: "INVALID_CLUSTER_ID",
-			in:   &pb.GetClusterRequest{
+			in: &pb.GetClusterRequest{
 				ClusterId: "NO_UUID_STRING",
 			},
 			checkResponse: func(req *pb.GetClusterRequest, res *pb.GetClusterResponse, err error) {
@@ -127,7 +127,7 @@ func TestGetCluster(t *testing.T) {
 		},
 		{
 			name: "NOT_EXISTED_CLUSTER",
-			in:   &pb.GetClusterRequest{
+			in: &pb.GetClusterRequest{
 				ClusterId: uuid.New().String(),
 			},
 			checkResponse: func(req *pb.GetClusterRequest, res *pb.GetClusterResponse, err error) {
@@ -159,35 +159,33 @@ func TestGetClusters(t *testing.T) {
 	}{
 		{
 			name: "OK_BY_CONTRACT_ID",
-			in:   &pb.GetClustersRequest{
+			in: &pb.GetClustersRequest{
 				ContractId: requestAddClusterInfo.ContractId,
 			},
 			checkResponse: func(req *pb.GetClustersRequest, res *pb.GetClustersResponse, err error) {
 				require.NoError(t, err)
 				require.Equal(t, res.Code, pb.Code_OK_UNSPECIFIED)
 
-				
 				require.True(t, len(res.Clusters) == 1)
 				require.Equal(t, res.Clusters[0].Id, createdClusterId)
 			},
 		},
 		{
 			name: "OK_BY_CSP_ID",
-			in:   &pb.GetClustersRequest{
+			in: &pb.GetClustersRequest{
 				CspId: requestAddClusterInfo.CspId,
 			},
 			checkResponse: func(req *pb.GetClustersRequest, res *pb.GetClustersResponse, err error) {
 				require.NoError(t, err)
 				require.Equal(t, res.Code, pb.Code_OK_UNSPECIFIED)
 
-				
 				require.True(t, len(res.Clusters) == 1)
 				require.Equal(t, res.Clusters[0].Id, createdClusterId)
 			},
 		},
 		{
 			name: "INVALID_CONTRACT_ID",
-			in:   &pb.GetClustersRequest{
+			in: &pb.GetClustersRequest{
 				ContractId: "NO_UUID_STRING",
 			},
 			checkResponse: func(req *pb.GetClustersRequest, res *pb.GetClustersResponse, err error) {
@@ -197,7 +195,7 @@ func TestGetClusters(t *testing.T) {
 		},
 		{
 			name: "INVALID_CSP_ID",
-			in:   &pb.GetClustersRequest{
+			in: &pb.GetClustersRequest{
 				ContractId: "NO_UUID_STRING",
 			},
 			checkResponse: func(req *pb.GetClustersRequest, res *pb.GetClustersResponse, err error) {
@@ -207,9 +205,9 @@ func TestGetClusters(t *testing.T) {
 		},
 		{
 			name: "CONTRACT_ID_AND_CSP_ID_PROVIDED",
-			in:   &pb.GetClustersRequest{
+			in: &pb.GetClustersRequest{
 				ContractId: uuid.New().String(),
-				CspId: uuid.New().String(),
+				CspId:      uuid.New().String(),
 			},
 			checkResponse: func(req *pb.GetClustersRequest, res *pb.GetClustersResponse, err error) {
 				require.Error(t, err)
@@ -218,7 +216,7 @@ func TestGetClusters(t *testing.T) {
 		},
 		{
 			name: "NOT_EXISTED_CLUSTERS_BY_CONTRACT_ID",
-			in:   &pb.GetClustersRequest{
+			in: &pb.GetClustersRequest{
 				ContractId: uuid.New().String(),
 			},
 			checkResponse: func(req *pb.GetClustersRequest, res *pb.GetClustersResponse, err error) {
@@ -228,7 +226,7 @@ func TestGetClusters(t *testing.T) {
 		},
 		{
 			name: "NOT_EXISTED_CLUSTERS_BY_CSP_ID",
-			in:   &pb.GetClustersRequest{
+			in: &pb.GetClustersRequest{
 				CspId: uuid.New().String(),
 			},
 			checkResponse: func(req *pb.GetClustersRequest, res *pb.GetClustersResponse, err error) {
@@ -260,9 +258,9 @@ func TestUpdateStatus(t *testing.T) {
 	}{
 		{
 			name: "OK",
-			in:   &pb.UpdateClusterStatusRequest{
+			in: &pb.UpdateClusterStatusRequest{
 				ClusterId: createdClusterId,
-				Status: pb.ClusterStatus_INSTALLING,
+				Status:    pb.ClusterStatus_INSTALLING,
 			},
 			checkResponse: func(req *pb.UpdateClusterStatusRequest, res *pb.SimpleResponse, err error) {
 				require.NoError(t, err)
@@ -274,15 +272,15 @@ func TestUpdateStatus(t *testing.T) {
 				cluster, err := clusterAccessor.GetCluster(clusterId)
 				require.NoError(t, err)
 
-				require.Equal(t, cluster.Id, createdClusterId )
-				require.Equal(t, cluster.Status, pb.ClusterStatus_INSTALLING )
+				require.Equal(t, cluster.Id, createdClusterId)
+				require.Equal(t, cluster.Status, pb.ClusterStatus_INSTALLING)
 			},
 		},
 		{
 			name: "INVALID_CLUSTER_ID",
-			in:   &pb.UpdateClusterStatusRequest{
+			in: &pb.UpdateClusterStatusRequest{
 				ClusterId: "NO_UUID_STRING",
-				Status: pb.ClusterStatus_INSTALLING,
+				Status:    pb.ClusterStatus_INSTALLING,
 			},
 			checkResponse: func(req *pb.UpdateClusterStatusRequest, res *pb.SimpleResponse, err error) {
 				require.Error(t, err)
@@ -291,9 +289,9 @@ func TestUpdateStatus(t *testing.T) {
 		},
 		{
 			name: "NOT_EXISTED_CLUSTER",
-			in:   &pb.UpdateClusterStatusRequest{
+			in: &pb.UpdateClusterStatusRequest{
 				ClusterId: uuid.New().String(),
-				Status: pb.ClusterStatus_INSTALLING,
+				Status:    pb.ClusterStatus_INSTALLING,
 			},
 			checkResponse: func(req *pb.UpdateClusterStatusRequest, res *pb.SimpleResponse, err error) {
 				require.Error(t, err)
@@ -315,8 +313,6 @@ func TestUpdateStatus(t *testing.T) {
 		})
 	}
 }
-
-
 
 // Helpers
 

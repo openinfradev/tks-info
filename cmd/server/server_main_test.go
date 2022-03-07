@@ -20,7 +20,6 @@ import (
 )
 
 var (
-	err error
 	db  *gorm.DB
 )
 
@@ -46,12 +45,19 @@ func TestMain(m *testing.M) {
 
 	db.Exec(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`)
 
-	err = db.AutoMigrate(&modelApplication.Application{})
-	err = db.AutoMigrate(&modelApplication.ApplicationGroup{})
-	err = db.AutoMigrate(&modelCluster.Cluster{})
-	err = db.AutoMigrate(&modelCspInfoInfo.CSPInfo{})
-	err = db.AutoMigrate(&modelKeyCloackInfo.KeycloakInfo{})
-	if err != nil {
+ 	if err := db.AutoMigrate(&modelApplication.ApplicationGroup{}); err != nil {
+		os.Exit(-1)
+	}
+	if err := db.AutoMigrate(&modelApplication.Application{}); err != nil {
+		os.Exit(-1)
+	}
+	if err := db.AutoMigrate(&modelCluster.Cluster{}); err != nil {
+		os.Exit(-1)
+	}
+	if err := db.AutoMigrate(&modelCspInfoInfo.CSPInfo{}); err != nil {
+		os.Exit(-1)
+	}
+	if err := db.AutoMigrate(&modelKeyCloackInfo.KeycloakInfo{}); err != nil {
 		os.Exit(-1)
 	}
 
@@ -61,8 +67,6 @@ func TestMain(m *testing.M) {
 	InitCspInfoHandler(db)
 
 	code := m.Run()
-
-	_ = pool != nil
 
 	if err := helper.RemovePostgres(pool, resource); err != nil {
 		fmt.Printf("Could not remove postgres: %s", err)

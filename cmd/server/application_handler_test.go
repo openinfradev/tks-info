@@ -11,14 +11,13 @@ import (
 )
 
 var (
-	createdAppGroupId  string
+	createdAppGroupId     string
 	requestCreateAppGroup *pb.CreateAppGroupRequest
 )
 
 func init() {
 	requestCreateAppGroup = randomCreateAppGroupRequest()
 }
-
 
 // Tests
 
@@ -45,8 +44,8 @@ func TestCreateAppGroup(t *testing.T) {
 		},
 		{
 			name: "INVALID_CLUSTER_ID",
-			in:   &pb.CreateAppGroupRequest{
-				ClusterId : "NO_UUID_STRING",
+			in: &pb.CreateAppGroupRequest{
+				ClusterId: "NO_UUID_STRING",
 			},
 			checkResponse: func(req *pb.CreateAppGroupRequest, res *pb.IDResponse, err error) {
 				require.Error(t, err)
@@ -84,15 +83,15 @@ func TestGetAppGroupsByClusterID(t *testing.T) {
 	}{
 		{
 			name: "OK",
-			in:   &pb.IDRequest{
+			in: &pb.IDRequest{
 				Id: requestCreateAppGroup.GetClusterId(),
 			},
 			checkResponse: func(req *pb.IDRequest, res *pb.GetAppGroupsResponse, err error) {
-				t.Logf( "res %s", res )
+				t.Logf("res %s", res)
 				require.NoError(t, err)
 				require.Equal(t, res.Code, pb.Code_OK_UNSPECIFIED)
 
-				require.True(t, len(res.GetAppGroups()) == 1 )
+				require.True(t, len(res.GetAppGroups()) == 1)
 				require.Equal(t, res.GetAppGroups()[0].GetClusterId(), requestCreateAppGroup.GetClusterId())
 				require.Equal(t, res.GetAppGroups()[0].GetAppGroupId(), requestCreateAppGroup.GetAppGroup().GetAppGroupId())
 				require.Equal(t, res.GetAppGroups()[0].GetAppGroupName(), requestCreateAppGroup.GetAppGroup().GetAppGroupName())
@@ -100,8 +99,8 @@ func TestGetAppGroupsByClusterID(t *testing.T) {
 		},
 		{
 			name: "INVALID_CLUSTER_ID",
-			in:   &pb.IDRequest{
-				Id : "NO_UUID_STRING",
+			in: &pb.IDRequest{
+				Id: "NO_UUID_STRING",
 			},
 			checkResponse: func(req *pb.IDRequest, res *pb.GetAppGroupsResponse, err error) {
 				require.Error(t, err)
@@ -110,8 +109,8 @@ func TestGetAppGroupsByClusterID(t *testing.T) {
 		},
 		{
 			name: "NOTE_EXIST_APPGROUPS",
-			in:   &pb.IDRequest{
-				Id : uuid.New().String(),
+			in: &pb.IDRequest{
+				Id: uuid.New().String(),
 			},
 			checkResponse: func(req *pb.IDRequest, res *pb.GetAppGroupsResponse, err error) {
 				require.NoError(t, err)
@@ -143,15 +142,15 @@ func TestGetAppGroups(t *testing.T) {
 	}{
 		{
 			name: "OK",
-			in:   &pb.GetAppGroupsRequest{
+			in: &pb.GetAppGroupsRequest{
 				AppGroupName: requestCreateAppGroup.GetAppGroup().GetAppGroupName(),
-				Type: requestCreateAppGroup.GetAppGroup().GetType(),
+				Type:         requestCreateAppGroup.GetAppGroup().GetType(),
 			},
 			checkResponse: func(req *pb.GetAppGroupsRequest, res *pb.GetAppGroupsResponse, err error) {
 				require.NoError(t, err)
 				require.Equal(t, res.Code, pb.Code_OK_UNSPECIFIED)
 
-				require.True(t, len(res.GetAppGroups()) == 1 )
+				require.True(t, len(res.GetAppGroups()) == 1)
 				require.Equal(t, res.GetAppGroups()[0].GetClusterId(), requestCreateAppGroup.GetClusterId())
 				require.Equal(t, res.GetAppGroups()[0].GetAppGroupId(), requestCreateAppGroup.GetAppGroup().GetAppGroupId())
 				require.Equal(t, res.GetAppGroups()[0].GetAppGroupName(), requestCreateAppGroup.GetAppGroup().GetAppGroupName())
@@ -159,20 +158,20 @@ func TestGetAppGroups(t *testing.T) {
 		},
 		{
 			name: "OK_NO_TYPE",
-			in:   &pb.GetAppGroupsRequest{
+			in: &pb.GetAppGroupsRequest{
 				AppGroupName: requestCreateAppGroup.GetAppGroup().GetAppGroupName(),
 			},
 			checkResponse: func(req *pb.GetAppGroupsRequest, res *pb.GetAppGroupsResponse, err error) {
 				require.NoError(t, err)
 				require.Equal(t, res.Code, pb.Code_OK_UNSPECIFIED)
-				require.True(t, len(res.GetAppGroups()) == 1 )
+				require.True(t, len(res.GetAppGroups()) == 1)
 			},
 		},
 		{
 			name: "INVALID_TYPE",
-			in:   &pb.GetAppGroupsRequest{
+			in: &pb.GetAppGroupsRequest{
 				AppGroupName: requestCreateAppGroup.GetAppGroup().GetAppGroupName(),
-				Type: pb.AppGroupType_SERVICE_MESH,
+				Type:         pb.AppGroupType_SERVICE_MESH,
 			},
 			checkResponse: func(req *pb.GetAppGroupsRequest, res *pb.GetAppGroupsResponse, err error) {
 				require.Error(t, err)
@@ -181,7 +180,7 @@ func TestGetAppGroups(t *testing.T) {
 		},
 		{
 			name: "EMPTY_NAME",
-			in:   &pb.GetAppGroupsRequest{
+			in: &pb.GetAppGroupsRequest{
 				AppGroupName: "",
 			},
 			checkResponse: func(req *pb.GetAppGroupsRequest, res *pb.GetAppGroupsResponse, err error) {
@@ -213,7 +212,7 @@ func TestGetAppGroup(t *testing.T) {
 	}{
 		{
 			name: "OK",
-			in:   &pb.GetAppGroupRequest{
+			in: &pb.GetAppGroupRequest{
 				AppGroupId: createdAppGroupId,
 			},
 			checkResponse: func(req *pb.GetAppGroupRequest, res *pb.GetAppGroupResponse, err error) {
@@ -223,12 +222,12 @@ func TestGetAppGroup(t *testing.T) {
 				require.Equal(t, res.GetAppGroup().GetClusterId(), requestCreateAppGroup.GetClusterId())
 				require.Equal(t, res.GetAppGroup().GetAppGroupId(), requestCreateAppGroup.GetAppGroup().GetAppGroupId())
 				require.Equal(t, res.GetAppGroup().GetAppGroupName(), requestCreateAppGroup.GetAppGroup().GetAppGroupName())
-				
+
 			},
 		},
 		{
 			name: "INVALID_APPGROUP_ID",
-			in:   &pb.GetAppGroupRequest{
+			in: &pb.GetAppGroupRequest{
 				AppGroupId: "NO_UUID_STRING",
 			},
 			checkResponse: func(req *pb.GetAppGroupRequest, res *pb.GetAppGroupResponse, err error) {
@@ -238,7 +237,7 @@ func TestGetAppGroup(t *testing.T) {
 		},
 		{
 			name: "NO_APPGROUP_ID",
-			in:   &pb.GetAppGroupRequest{
+			in: &pb.GetAppGroupRequest{
 				AppGroupId: uuid.New().String(),
 			},
 			checkResponse: func(req *pb.GetAppGroupRequest, res *pb.GetAppGroupResponse, err error) {
@@ -270,9 +269,9 @@ func TestUpdateAppGroupStatus(t *testing.T) {
 	}{
 		{
 			name: "OK",
-			in:   &pb.UpdateAppGroupStatusRequest{
+			in: &pb.UpdateAppGroupStatusRequest{
 				AppGroupId: createdAppGroupId,
-				Status: pb.AppGroupStatus_APP_GROUP_RUNNING,
+				Status:     pb.AppGroupStatus_APP_GROUP_RUNNING,
 			},
 			checkResponse: func(req *pb.UpdateAppGroupStatusRequest, res *pb.SimpleResponse, err error) {
 				require.NoError(t, err)
@@ -285,12 +284,12 @@ func TestUpdateAppGroupStatus(t *testing.T) {
 				require.NoError(t, err)
 
 				require.Equal(t, appGroup.GetAppGroupId(), req.GetAppGroupId())
-				require.Equal(t, appGroup.GetStatus(), req.GetStatus() )
+				require.Equal(t, appGroup.GetStatus(), req.GetStatus())
 			},
 		},
 		{
 			name: "INVALID_APPGROUP_ID",
-			in:   &pb.UpdateAppGroupStatusRequest{
+			in: &pb.UpdateAppGroupStatusRequest{
 				AppGroupId: "NO_UUID_STRING",
 			},
 			checkResponse: func(req *pb.UpdateAppGroupStatusRequest, res *pb.SimpleResponse, err error) {
@@ -300,7 +299,7 @@ func TestUpdateAppGroupStatus(t *testing.T) {
 		},
 		{
 			name: "NO_APPGROUP_ID",
-			in:   &pb.UpdateAppGroupStatusRequest{
+			in: &pb.UpdateAppGroupStatusRequest{
 				AppGroupId: uuid.New().String(),
 			},
 			checkResponse: func(req *pb.UpdateAppGroupStatusRequest, res *pb.SimpleResponse, err error) {
@@ -332,11 +331,11 @@ func TestUpdateApp(t *testing.T) {
 	}{
 		{
 			name: "OK",
-			in:   &pb.UpdateAppRequest{
-				AppGroupId : createdAppGroupId,
-				AppType : pb.AppType_THANOS,
-				Endpoint : "endpoint",
-				Metadata : "{\"metadata\":\"no_data\"}",
+			in: &pb.UpdateAppRequest{
+				AppGroupId: createdAppGroupId,
+				AppType:    pb.AppType_THANOS,
+				Endpoint:   "endpoint",
+				Metadata:   "{\"metadata\":\"no_data\"}",
 			},
 			checkResponse: func(req *pb.UpdateAppRequest, res *pb.SimpleResponse, err error) {
 				require.NoError(t, err)
@@ -345,8 +344,8 @@ func TestUpdateApp(t *testing.T) {
 		},
 		{
 			name: "INVALID_APPGROUP_ID",
-			in:   &pb.UpdateAppRequest{
-				AppGroupId : "THIS_IS_NOT_UUID",
+			in: &pb.UpdateAppRequest{
+				AppGroupId: "THIS_IS_NOT_UUID",
 			},
 			checkResponse: func(req *pb.UpdateAppRequest, res *pb.SimpleResponse, err error) {
 				require.Error(t, err)
@@ -355,8 +354,8 @@ func TestUpdateApp(t *testing.T) {
 		},
 		{
 			name: "NO_EXIST_APPGROUP_ID",
-			in:   &pb.UpdateAppRequest{
-				AppGroupId : uuid.New().String(),
+			in: &pb.UpdateAppRequest{
+				AppGroupId: uuid.New().String(),
 			},
 			checkResponse: func(req *pb.UpdateAppRequest, res *pb.SimpleResponse, err error) {
 				require.Error(t, err)
@@ -365,11 +364,11 @@ func TestUpdateApp(t *testing.T) {
 		},
 		{
 			name: "INVALID_JSON_DATA",
-			in:   &pb.UpdateAppRequest{
-				AppGroupId : createdAppGroupId,
-				AppType : pb.AppType_THANOS,
-				Endpoint : "endpoint",
-				Metadata : "THIS_IS_NOT_JOSN_DATA",
+			in: &pb.UpdateAppRequest{
+				AppGroupId: createdAppGroupId,
+				AppType:    pb.AppType_THANOS,
+				Endpoint:   "endpoint",
+				Metadata:   "THIS_IS_NOT_JOSN_DATA",
 			},
 			checkResponse: func(req *pb.UpdateAppRequest, res *pb.SimpleResponse, err error) {
 				require.Error(t, err)
@@ -400,7 +399,7 @@ func TestGetAppsByAppGroupID(t *testing.T) {
 	}{
 		{
 			name: "OK",
-			in:   &pb.IDRequest{
+			in: &pb.IDRequest{
 				Id: createdAppGroupId,
 			},
 			checkResponse: func(req *pb.IDRequest, res *pb.GetAppsResponse, err error) {
@@ -410,7 +409,7 @@ func TestGetAppsByAppGroupID(t *testing.T) {
 		},
 		{
 			name: "INVALID_APPGROUP_ID",
-			in:   &pb.IDRequest{
+			in: &pb.IDRequest{
 				Id: "NO_UUID_STRING",
 			},
 			checkResponse: func(req *pb.IDRequest, res *pb.GetAppsResponse, err error) {
@@ -420,7 +419,7 @@ func TestGetAppsByAppGroupID(t *testing.T) {
 		},
 		{
 			name: "NO_APPGROUP_ID",
-			in:   &pb.IDRequest{
+			in: &pb.IDRequest{
 				Id: uuid.New().String(),
 			},
 			checkResponse: func(req *pb.IDRequest, res *pb.GetAppsResponse, err error) {
@@ -452,7 +451,7 @@ func TestDeleteAppGroup(t *testing.T) {
 	}{
 		{
 			name: "OK",
-			in:   &pb.DeleteAppGroupRequest{
+			in: &pb.DeleteAppGroupRequest{
 				AppGroupId: createdAppGroupId,
 			},
 			checkResponse: func(req *pb.DeleteAppGroupRequest, res *pb.SimpleResponse, err error) {
@@ -469,7 +468,7 @@ func TestDeleteAppGroup(t *testing.T) {
 		},
 		{
 			name: "INVALID_APPGROUP_ID",
-			in:   &pb.DeleteAppGroupRequest{
+			in: &pb.DeleteAppGroupRequest{
 				AppGroupId: "NO_UUID_STRING",
 			},
 			checkResponse: func(req *pb.DeleteAppGroupRequest, res *pb.SimpleResponse, err error) {
@@ -479,7 +478,7 @@ func TestDeleteAppGroup(t *testing.T) {
 		},
 		{
 			name: "NO_APPGROUP_ID",
-			in:   &pb.DeleteAppGroupRequest{
+			in: &pb.DeleteAppGroupRequest{
 				AppGroupId: uuid.New().String(),
 			},
 			checkResponse: func(req *pb.DeleteAppGroupRequest, res *pb.SimpleResponse, err error) {
@@ -506,14 +505,14 @@ func TestDeleteAppGroup(t *testing.T) {
 // Helpers
 
 func randomCreateAppGroupRequest() *pb.CreateAppGroupRequest {
-	return &pb.CreateAppGroupRequest {
-		ClusterId : uuid.New().String(),
-		AppGroup : &pb.AppGroup {
-			AppGroupId : uuid.New().String(),
-			AppGroupName : randomString("APPGROUPNAME"),
-			Type : pb.AppGroupType_APP_TYPE_UNSPECIFIED,
-			ClusterId : uuid.New().String(),
-			Status : pb.AppGroupStatus_APP_GROUP_UNSPECIFIED,
+	return &pb.CreateAppGroupRequest{
+		ClusterId: uuid.New().String(),
+		AppGroup: &pb.AppGroup{
+			AppGroupId:    uuid.New().String(),
+			AppGroupName:  randomString("APPGROUPNAME"),
+			Type:          pb.AppGroupType_APP_TYPE_UNSPECIFIED,
+			ClusterId:     uuid.New().String(),
+			Status:        pb.AppGroupStatus_APP_GROUP_UNSPECIFIED,
 			ExternalLabel: randomString("EXTERNALLABEL"),
 		},
 	}

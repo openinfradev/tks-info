@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"google.golang.org/grpc/credentials/insecure"
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	"google.golang.org/grpc"
 	//"google.golang.org/grpc/credentials"
@@ -14,7 +15,6 @@ import (
 )
 
 var (
-	conn              *grpc.ClientConn
 	clusterInfoClient pb.ClusterInfoServiceClient
 	cspInfoClient     pb.CspInfoServiceClient
 	appInfoClient     pb.AppInfoServiceClient
@@ -34,10 +34,21 @@ func RequestLogging() grpc.UnaryClientInterceptor {
 }
 
 func GetConnection(host string) (*grpc.ClientConn, error) {
+	conn, _ := grpc.Dial(
+		host,
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+		grpc.WithUnaryInterceptor(
+			grpc_middleware.ChainUnaryClient(
+				log.IOLog(),
+			),
+		),
+	)
+
+
 	if conn == nil {
 		_conn, err := grpc.Dial(
 			host,
-			grpc.WithInsecure(),
+			grpc.WithTransportCredentials(insecure.NewCredentials()),
 			grpc.WithUnaryInterceptor(
 				grpc_middleware.ChainUnaryClient(
 					RequestLogging(),
