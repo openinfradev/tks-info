@@ -1,13 +1,22 @@
 package cluster_test
 
 import (
-	uuid "github.com/google/uuid"
-	"github.com/openinfradev/tks-info/pkg/cluster"
-	pb "github.com/openinfradev/tks-proto/tks_pb"
-	"github.com/stretchr/testify/assert"
+	"fmt"
+	"os"
+	"testing"
+
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"testing"
+
+	"github.com/google/uuid"
+	"github.com/stretchr/testify/assert"
+
+	"github.com/openinfradev/tks-common/pkg/helper"
+	"github.com/openinfradev/tks-common/pkg/log"
+
+	"github.com/openinfradev/tks-info/pkg/cluster"
+	"github.com/openinfradev/tks-info/pkg/cluster/model"
+	pb "github.com/openinfradev/tks-proto/tks_pb"
 )
 
 var (
@@ -16,16 +25,56 @@ var (
 	contractId      uuid.UUID
 	clusterAccessor *cluster.ClusterAccessor
 	clusterName     string
-	err             error
+)
+
+var (
+	testDBHost string
+	testDBPort string
+	err error
 )
 
 func init() {
-	dsn := "host=localhost user=postgres password=password dbname=tks port=5432 sslmode=disable TimeZone=Asia/Seoul"
-	db, _ := gorm.Open(postgres.Open(dsn), &gorm.Config{})
-	clusterAccessor = cluster.New(db)
 	contractId = uuid.New()
 	cspId = uuid.New()
 	clusterName = "testCluster"
+
+	log.Disable()
+}
+
+func getAccessor() (*cluster.ClusterAccessor, error) {
+	dsn := fmt.Sprintf(
+		"host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Asia/Seoul",
+		testDBHost, "postgres", "password", "tks", testDBPort)
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	if err != nil {
+		return nil, err
+	}
+
+	db.Exec(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`)
+
+	if err := db.AutoMigrate(&model.Cluster{}); err != nil {
+		return nil, err
+	}
+
+	return cluster.New(db), nil
+}
+
+func TestMain(m *testing.M) {
+	pool, resource, err := helper.CreatePostgres()
+	if err != nil {
+		fmt.Printf("Could not create postgres: %s", err)
+		os.Exit(-1)
+	}
+	testDBHost, testDBPort = helper.GetHostAndPort(resource)
+	clusterAccessor, _ = getAccessor()
+
+	code := m.Run()
+
+	if err := helper.RemovePostgres(pool, resource); err != nil {
+		fmt.Printf("Could not remove postgres: %s", err)
+		os.Exit(-1)
+	}
+	os.Exit(code)
 }
 
 // Create creates new cluster with contract ID, csp ID, name.

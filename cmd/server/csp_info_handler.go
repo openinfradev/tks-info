@@ -3,10 +3,11 @@ package main
 import (
 	"context"
 	"fmt"
-	"gorm.io/gorm"
 
 	"github.com/google/uuid"
-	"github.com/openinfradev/tks-contract/pkg/log"
+	"gorm.io/gorm"
+
+	"github.com/openinfradev/tks-common/pkg/log"
 	"github.com/openinfradev/tks-info/pkg/csp_info"
 	pb "github.com/openinfradev/tks-proto/tks_pb"
 )
@@ -35,7 +36,7 @@ func (s *CspInfoServer) CreateCSPInfo(ctx context.Context, in *pb.CreateCSPInfoR
 				Msg: fmt.Sprintf("invalid contract ID %s", in.GetContractId()),
 			},
 		}
-		return &res, nil
+		return &res, err
 	}
 
 	id, err := cspInfoAccessor.Create(contractId, in.GetCspName(), in.GetAuth(), in.GetCspType())
@@ -45,7 +46,7 @@ func (s *CspInfoServer) CreateCSPInfo(ctx context.Context, in *pb.CreateCSPInfoR
 			Error: &pb.Error{
 				Msg: err.Error(),
 			},
-		}, nil
+		}, err
 	}
 
 	return &pb.IDResponse{
@@ -66,7 +67,7 @@ func (s *CspInfoServer) GetCSPInfo(ctx context.Context, in *pb.IDRequest) (*pb.G
 			Error: &pb.Error{
 				Msg: fmt.Sprintf("invalid csp ID %s", in.GetId()),
 			},
-		}, nil
+		}, err
 	}
 
 	cspInfo, err2 := cspInfoAccessor.GetCSPInfo(cspId)
@@ -76,7 +77,7 @@ func (s *CspInfoServer) GetCSPInfo(ctx context.Context, in *pb.IDRequest) (*pb.G
 			Error: &pb.Error{
 				Msg: err2.Error(),
 			},
-		}, nil
+		}, err2
 	}
 
 	return &pb.GetCSPInfoResponse{
