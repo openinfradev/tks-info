@@ -5,6 +5,7 @@ CREATE TABLE application_groups
     name character varying(50) COLLATE pg_catalog."default",
     id uuid primary key,
     type bigint,
+    subtype bigint,
     status bigint,
     cluster_id uuid,
     external_label character varying(50) COLLATE pg_catalog."default",

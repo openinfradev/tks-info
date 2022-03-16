@@ -82,6 +82,7 @@ func TestCreateApplicationGroup(t *testing.T) {
 	appGroup1 := pb.AppGroup{
 		AppGroupName:  appName,
 		Type:          pb.AppGroupType_LMA,
+		Subtype:       pb.AppGroupSubtype_LOKI,
 		Status:        pb.AppGroupStatus_APP_GROUP_INSTALLING,
 		ExternalLabel: "test_env",
 	}

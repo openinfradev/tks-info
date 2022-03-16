@@ -13,6 +13,7 @@ type ApplicationGroup struct {
 	ID            uuid.UUID `gorm:"primarykey;type:uuid;default:uuid_generate_v4()"`
 	Name          string
 	Type          pb.AppGroupType
+	Subtype       pb.AppGroupSubtype
 	Status        pb.AppGroupStatus
 	ClusterId     uuid.UUID `gorm:"type:uuid;"`
 	ExternalLabel string

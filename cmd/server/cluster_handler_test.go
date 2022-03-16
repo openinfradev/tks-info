@@ -60,7 +60,8 @@ func TestAddClusterInfo(t *testing.T) {
 		{
 			name: "INVALID_CSP_ID",
 			in: &pb.AddClusterInfoRequest{
-				ContractId: "NO_UUID_STRING",
+				ContractId: requestAddClusterInfo.ContractId,
+				CspId:      "NO_UUID_STRING",
 			},
 			checkResponse: func(req *pb.AddClusterInfoRequest, res *pb.IDResponse, err error) {
 				require.Error(t, err)

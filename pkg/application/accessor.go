@@ -40,6 +40,7 @@ func (x *Accessor) Create(clusterID uuid.UUID, appGroup *pb.AppGroup) (uuid.UUID
 		Name:          appGroup.GetAppGroupName(),
 		ClusterId:     clusterID,
 		Type:          appGroup.GetType(),
+		Subtype:       appGroup.GetSubtype(),
 		Status:        appGroup.GetStatus(),
 		ExternalLabel: appGroup.GetExternalLabel(),
 	}
@@ -193,6 +194,7 @@ func reflectToPbAppGroup(model model.ApplicationGroup) *pb.AppGroup {
 		AppGroupId:    model.ID.String(),
 		AppGroupName:  model.Name,
 		Type:          model.Type,
+		Subtype:       model.Subtype,
 		Status:        model.Status,
 		ClusterId:     model.ClusterId.String(),
 		ExternalLabel: model.ExternalLabel,
