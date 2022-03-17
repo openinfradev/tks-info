@@ -79,13 +79,12 @@ func (x *ClusterAccessor) CreateClusterInfo(contractId uuid.UUID, cspId uuid.UUI
 		CspID:          cspId,
 		Name:           name,
 		Status:         pb.ClusterStatus_UNSPECIFIED,
-		MasterFlavor:   conf.MasterFlavor,
-		MasterReplicas: conf.MasterReplicas,
-		MasterRootSize: conf.MasterRootSize,
-		WorkerFlavor:   conf.WorkerFlavor,
-		WorkerReplicas: conf.WorkerReplicas,
-		WorkerRootSize: conf.WorkerRootSize,
-		K8sVersion:     conf.K8SVersion,
+    SshKeyName:     conf.SshKeyName,
+    Region:         conf.Region,
+    NumOfAz:        conf.NumOfAz,
+    MachineType:    conf.MachineType,
+    MinSizePerAz:   conf.MinSizePerAz,
+    MaxSizePerAz:   conf.MaxSizePerAz,
 	}
 
 	res := x.db.Create(&cluster)
@@ -112,13 +111,12 @@ func (x *ClusterAccessor) UpdateStatus(id uuid.UUID, status pb.ClusterStatus) er
 
 func ConvertToPbCluster(cluster model.Cluster) *pb.Cluster {
 	tempConf := pb.ClusterConf{
-		MasterFlavor:   cluster.MasterFlavor,
-		MasterReplicas: cluster.MasterReplicas,
-		MasterRootSize: cluster.MasterRootSize,
-		WorkerFlavor:   cluster.WorkerFlavor,
-		WorkerReplicas: cluster.WorkerReplicas,
-		WorkerRootSize: cluster.WorkerRootSize,
-		K8SVersion:     cluster.K8sVersion,
+    SshKeyName:     cluster.SshKeyName,
+    Region:         cluster.Region,
+    NumOfAz:        cluster.NumOfAz,
+    MachineType:    cluster.MachineType,
+    MinSizePerAz:   cluster.MinSizePerAz,
+    MaxSizePerAz:   cluster.MaxSizePerAz,
 	}
 
 	return &pb.Cluster{

@@ -15,14 +15,13 @@ type Cluster struct {
 	ContractID     uuid.UUID
 	CspID          uuid.UUID
 	Status         pb.ClusterStatus
-	MasterFlavor   string
-	MasterReplicas int32
-	MasterRootSize int64
-	WorkerFlavor   string
-	WorkerReplicas int32
-	WorkerRootSize int64
-	K8sVersion     string
-	Kubeconfig     string
+  SshKeyName     string
+  Region         string
+  NumOfAz        int32
+  MachineType    string
+  MinSizePerAz   int32
+  MaxSizePerAz   int32
+  Kubeconfig     string
 	UpdatedAt      time.Time
 	CreatedAt      time.Time
 }
