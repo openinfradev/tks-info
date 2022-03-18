@@ -3,71 +3,80 @@ package main
 import (
 	"flag"
 	"fmt"
-	"net"
 
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 
+	"github.com/openinfradev/tks-common/pkg/grpc_server"
 	"github.com/openinfradev/tks-common/pkg/log"
-	"github.com/openinfradev/tks-info/pkg/cert"
 	pb "github.com/openinfradev/tks-proto/tks_pb"
 )
 
 var (
-	port       = flag.Int("port", 9111, "The gRPC server port")
-	tls        = flag.Bool("tls", false, "Connection uses TLS if true, else plain TCP")
-	certFile   = flag.String("cert_file", "", "The TLS cert file")
-	keyFile    = flag.String("key_file", "", "The TLS key file")
-	dbhost     = flag.String("dbhost", "localhost", "host of postgreSQL")
-	dbport     = flag.String("dbport", "5432", "port of postgreSQL")
-	dbuser     = flag.String("dbuser", "postgres", "postgreSQL user")
-	dbpassword = flag.String("dbpassword", "password", "password for postgreSQL user")
+	port               int
+	tls                bool
+	tlsClientCertPath  string
+	tlsCertPath        string
+	tlsKeyPath         string
+
+	dbhost             string
+	dbport             string
+	dbuser             string
+	dbpassword         string
 )
 
+func init() {
+	flag.IntVar(&port, "port", 9111, "service port")
+	flag.BoolVar(&tls, "tls", false, "enabled tls")
+	flag.StringVar(&tlsClientCertPath, "tls-client-cert-path", "../../cert/tks-ca.crt", "path of ca cert file for tls")
+	flag.StringVar(&tlsCertPath, "tls-cert-path", "../../cert/tks-server.crt", "path of cert file for tls")
+	flag.StringVar(&tlsKeyPath, "tls-key-path", "../../cert/tks-server.key", "path of key file for tls")
+	flag.StringVar(&dbhost, "dbhost", "localhost", "host of postgreSQL")
+	flag.StringVar(&dbport, "dbport", "5432", "port of postgreSQL")
+	flag.StringVar(&dbuser, "dbuser", "postgres", "postgreSQL user")
+	flag.StringVar(&dbpassword, "dbpassword", "password", "password for postgreSQL user")
+}
+
 func main() {
-	log.Info("tksinfo server is starting...")
 	flag.Parse()
 
-	addr := fmt.Sprintf(":%d", *port)
-	lis, err := net.Listen("tcp", addr)
-	if err != nil {
-		// log.Fatalln("Failed to listen:", err)
-		log.Fatal("failed to listen:", err)
-	}
+	log.Info("*** Arguments *** ")
+	log.Info("port : ", port)
+	log.Info("tls : ", tls)
+	log.Info("tlsClientCertPath : ", tlsClientCertPath)
+	log.Info("tlsCertPath : ", tlsCertPath)
+	log.Info("tlsKeyPath : ", tlsKeyPath)
+	log.Info("dbhost : ", dbhost)
+	log.Info("dbport : ", dbport)
+	log.Info("dbuser : ", dbuser)
+	log.Info("dbpassword : ", dbpassword)
+	log.Info("****************** ")
 
-	var opts []grpc.ServerOption
-	if *tls {
-		if *certFile == "" {
-			*certFile = cert.Path("x509/server_cert.pem")
-		}
-		if *keyFile == "" {
-			*keyFile = cert.Path("x509/server_key.pem")
-		}
-		creds, err := credentials.NewServerTLSFromFile(*certFile, *keyFile)
-		if err != nil {
-			log.Fatal("Failed to generate credentials", err)
-		}
-		opts = []grpc.ServerOption{grpc.Creds(creds)}
-	}
-
-	s := grpc.NewServer(opts...)
-
+	// initialize database
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=tks port=%s sslmode=disable TimeZone=Asia/Seoul",
-		*dbhost, *dbuser, *dbpassword, *dbport)
-	db, _ := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+		dbhost, dbuser, dbpassword, dbport)
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	if err != nil {
+		log.Fatal("failed to open database ", err)
+	}
 
+	// initialize handlers
 	InitAppInfoHandler(db)
 	InitClusterInfoHandler(db)
 	InitCspInfoHandler(db)
 	InitKeycloakInfoHandler(db)
+
+	// start server
+	s, conn, err := grpc_server.CreateServer(port, tls, tlsCertPath, tlsKeyPath)
+	if err != nil {
+		log.Fatal("failed to crate grpc_server : ", err)
+	}
+
 	pb.RegisterAppInfoServiceServer(s, &AppInfoServer{})
 	pb.RegisterClusterInfoServiceServer(s, &ClusterInfoServer{})
 	pb.RegisterCspInfoServiceServer(s, &CspInfoServer{})
 	pb.RegisterKeycloakInfoServiceServer(s, &KeycloakInfoServer{})
-
-	if err := s.Serve(lis); err != nil {
+	if err := s.Serve(conn); err != nil {
 		log.Fatal("failed to serve: ", err)
 	}
 }
