@@ -322,14 +322,12 @@ func randomAddClusterInfoRequest() *pb.AddClusterInfoRequest {
 		CspId:      uuid.New().String(),
 		Name:       randomString("Name"),
 		Conf: &pb.ClusterConf{
-			MasterFlavor:   randomString("MASTERFLAVOR"),
-			MasterReplicas: 3,
-			MasterRootSize: 30,
-			WorkerFlavor:   randomString("WORKERFLAVOR"),
-			WorkerReplicas: 3,
-			WorkerRootSize: 30,
-			K8SVersion:     "1.21",
-			Region:         randomString("REGION"),
+			SshKeyName:   randomString("SSHKEYNAME"),
+			Region:       randomString("REGION"),
+			NumOfAz:      3,
+			MachineType:  randomString("MACHINETYPE"),
+			MinSizePerAz: 1,
+			MaxSizePerAz: 5,
 		},
 	}
 }
