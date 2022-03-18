@@ -65,13 +65,13 @@ func main() {
 func doCreateCluster(cc *grpc.ClientConn) {
 	c := pb.NewClusterInfoServiceClient(cc)
 
-  dummyConf := pb.ClusterConf{
-    SshKeyName:     "tks-seoul",
-    Region:         "ap-northeast-2",
-    NumOfAz:        3,
-    MachineType:    "t3.large",
-    MinSizePerAz:   1,
-    MaxSizePerAz:   5,
+	dummyConf := pb.ClusterConf{
+		SshKeyName:   "tks-seoul",
+		Region:       "ap-northeast-2",
+		NumOfAz:      3,
+		MachineType:  "t3.large",
+		MinSizePerAz: 1,
+		MaxSizePerAz: 5,
 	}
 
 	req := &pb.AddClusterInfoRequest{
