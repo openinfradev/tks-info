@@ -30,7 +30,7 @@ var (
 var (
 	testDBHost string
 	testDBPort string
-	err error
+	err        error
 )
 
 func init() {
@@ -80,13 +80,12 @@ func TestMain(m *testing.M) {
 // Create creates new cluster with contract ID, csp ID, name.
 func TestCreateClusterInfo(t *testing.T) {
 	dummyConf := pb.ClusterConf{
-		MasterFlavor:   "tiny",
-		MasterReplicas: 3,
-		MasterRootSize: 50,
-		WorkerFlavor:   "medium",
-		WorkerReplicas: 5,
-		WorkerRootSize: 50,
-		K8SVersion:     "1.18.8",
+		SshKeyName:   "tks-seoul",
+		Region:       "ap-northeast-2",
+		NumOfAz:      3,
+		MachineType:  "t3.large",
+		MinSizePerAz: 1,
+		MaxSizePerAz: 5,
 	}
 
 	clusterId, err = clusterAccessor.CreateClusterInfo(contractId, cspId, clusterName, &dummyConf)
