@@ -13,21 +13,21 @@ import (
 )
 
 var (
-	port               int
-	tls                bool
-	tlsClientCertPath  string
-	tlsCertPath        string
-	tlsKeyPath         string
+	port              int
+	tlsEnabled        bool
+	tlsClientCertPath string
+	tlsCertPath       string
+	tlsKeyPath        string
 
-	dbhost             string
-	dbport             string
-	dbuser             string
-	dbpassword         string
+	dbhost     string
+	dbport     string
+	dbuser     string
+	dbpassword string
 )
 
 func init() {
 	flag.IntVar(&port, "port", 9111, "service port")
-	flag.BoolVar(&tls, "tls", false, "enabled tls")
+	flag.BoolVar(&tlsEnabled, "tlsEnabled", false, "enabled tls")
 	flag.StringVar(&tlsClientCertPath, "tls-client-cert-path", "../../cert/tks-ca.crt", "path of ca cert file for tls")
 	flag.StringVar(&tlsCertPath, "tls-cert-path", "../../cert/tks-server.crt", "path of cert file for tls")
 	flag.StringVar(&tlsKeyPath, "tls-key-path", "../../cert/tks-server.key", "path of key file for tls")
@@ -42,7 +42,7 @@ func main() {
 
 	log.Info("*** Arguments *** ")
 	log.Info("port : ", port)
-	log.Info("tls : ", tls)
+	log.Info("tlsEnabled : ", tlsEnabled)
 	log.Info("tlsClientCertPath : ", tlsClientCertPath)
 	log.Info("tlsCertPath : ", tlsCertPath)
 	log.Info("tlsKeyPath : ", tlsKeyPath)
@@ -67,7 +67,7 @@ func main() {
 	InitKeycloakInfoHandler(db)
 
 	// start server
-	s, conn, err := grpc_server.CreateServer(port, tls, tlsCertPath, tlsKeyPath)
+	s, conn, err := grpc_server.CreateServer(port, tlsEnabled, tlsCertPath, tlsKeyPath)
 	if err != nil {
 		log.Fatal("failed to crate grpc_server : ", err)
 	}
