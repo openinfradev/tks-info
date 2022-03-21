@@ -10,21 +10,20 @@ import (
 
 // Cluster represents a kubernetes cluster information.
 type Cluster struct {
-	ID             uuid.UUID `gorm:"primarykey;type:uuid;default:uuid_generate_v4()"`
-	Name           string
-	ContractID     uuid.UUID
-	CspID          uuid.UUID
-	Status         pb.ClusterStatus
-	MasterFlavor   string
-	MasterReplicas int32
-	MasterRootSize int64
-	WorkerFlavor   string
-	WorkerReplicas int32
-	WorkerRootSize int64
-	K8sVersion     string
-	Kubeconfig     string
-	UpdatedAt      time.Time
-	CreatedAt      time.Time
+	ID           uuid.UUID `gorm:"primarykey;type:uuid;default:uuid_generate_v4()"`
+	Name         string
+	ContractID   uuid.UUID
+	CspID        uuid.UUID
+	Status       pb.ClusterStatus
+	SshKeyName   string
+	Region       string
+	NumOfAz      int32
+	MachineType  string
+	MinSizePerAz int32
+	MaxSizePerAz int32
+	Kubeconfig   string
+	UpdatedAt    time.Time
+	CreatedAt    time.Time
 }
 
 func (c *Cluster) BeforeCreate(tx *gorm.DB) (err error) {

@@ -66,13 +66,12 @@ func doCreateCluster(cc *grpc.ClientConn) {
 	c := pb.NewClusterInfoServiceClient(cc)
 
 	dummyConf := pb.ClusterConf{
-		MasterFlavor:   "tiny",
-		MasterReplicas: 3,
-		MasterRootSize: 50,
-		WorkerFlavor:   "medium",
-		WorkerReplicas: 5,
-		WorkerRootSize: 50,
-		K8SVersion:     "1.18.8",
+		SshKeyName:   "tks-seoul",
+		Region:       "ap-northeast-2",
+		NumOfAz:      3,
+		MachineType:  "t3.large",
+		MinSizePerAz: 1,
+		MaxSizePerAz: 5,
 	}
 
 	req := &pb.AddClusterInfoRequest{

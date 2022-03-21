@@ -7,7 +7,7 @@ require (
 	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0
 	github.com/jackc/pgx/v4 v4.15.0 // indirect
 	github.com/openinfradev/tks-common v0.0.0-20220321044608-105302d33457 // indirect
-	github.com/openinfradev/tks-proto v0.0.6-0.20220304011855-99ac351f420f
+	github.com/openinfradev/tks-proto v0.0.6-0.20220318062944-7fccd257bcae
 	github.com/stretchr/testify v1.7.0
 	golang.org/x/crypto v0.0.0-20220210151621-f4118a5b28e2 // indirect
 	golang.org/x/net v0.0.0-20220127200216-cd36cc0744dd // indirect
