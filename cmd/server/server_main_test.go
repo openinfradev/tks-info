@@ -20,7 +20,7 @@ import (
 )
 
 var (
-	db  *gorm.DB
+	db *gorm.DB
 )
 
 func init() {
@@ -45,7 +45,7 @@ func TestMain(m *testing.M) {
 
 	db.Exec(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`)
 
- 	if err := db.AutoMigrate(&modelApplication.ApplicationGroup{}); err != nil {
+	if err := db.AutoMigrate(&modelApplication.ApplicationGroup{}); err != nil {
 		os.Exit(-1)
 	}
 	if err := db.AutoMigrate(&modelApplication.Application{}); err != nil {
