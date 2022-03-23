@@ -2,12 +2,15 @@ package main
 
 import (
 	"context"
+	"errors"
 	"testing"
 
+	"github.com/golang/mock/gomock"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
 
 	pb "github.com/openinfradev/tks-proto/tks_pb"
+	mocktks "github.com/openinfradev/tks-proto/tks_pb/mock"
 )
 
 var (
@@ -155,6 +158,7 @@ func TestGetClusters(t *testing.T) {
 	testCases := []struct {
 		name          string
 		in            *pb.GetClustersRequest
+		buildStubs    func(mockContractClient *mocktks.MockContractServiceClient)
 		checkResponse func(req *pb.GetClustersRequest, res *pb.GetClustersResponse, err error)
 	}{
 		{
@@ -162,6 +166,7 @@ func TestGetClusters(t *testing.T) {
 			in: &pb.GetClustersRequest{
 				ContractId: requestAddClusterInfo.ContractId,
 			},
+			buildStubs: func(mockContractClient *mocktks.MockContractServiceClient) {},
 			checkResponse: func(req *pb.GetClustersRequest, res *pb.GetClustersResponse, err error) {
 				require.NoError(t, err)
 				require.Equal(t, res.Code, pb.Code_OK_UNSPECIFIED)
@@ -175,6 +180,7 @@ func TestGetClusters(t *testing.T) {
 			in: &pb.GetClustersRequest{
 				CspId: requestAddClusterInfo.CspId,
 			},
+			buildStubs: func(mockContractClient *mocktks.MockContractServiceClient) {},
 			checkResponse: func(req *pb.GetClustersRequest, res *pb.GetClustersResponse, err error) {
 				require.NoError(t, err)
 				require.Equal(t, res.Code, pb.Code_OK_UNSPECIFIED)
@@ -184,10 +190,53 @@ func TestGetClusters(t *testing.T) {
 			},
 		},
 		{
+			name: "USE_DEFAULT_CONTRACT_AND_NOT_EXISTS_CLUSTERS",
+			in: &pb.GetClustersRequest{
+				ContractId: "",
+				CspId:      "",
+			},
+			buildStubs: func(mockContractClient *mocktks.MockContractServiceClient) {
+				mockContractClient.EXPECT().GetDefaultContract(gomock.Any(), gomock.Any()).Times(1).
+					Return(
+						&pb.GetContractResponse{
+							Code:  pb.Code_OK_UNSPECIFIED,
+							Error: nil,
+							Contract: &pb.Contract{
+								ContractId: uuid.New().String(),
+								CspId:      uuid.New().String(),
+							},
+						}, nil)
+			},
+			checkResponse: func(req *pb.GetClustersRequest, res *pb.GetClustersResponse, err error) {
+				require.Error(t, err)
+				require.Equal(t, res.Code, pb.Code_NOT_FOUND)
+			},
+		},
+		{
+			name: "FAILED_TO_GET_DEFAULT_CONTRACT",
+			in: &pb.GetClustersRequest{
+				ContractId: "",
+				CspId:      "",
+			},
+			buildStubs: func(mockContractClient *mocktks.MockContractServiceClient) {
+				mockContractClient.EXPECT().GetDefaultContract(gomock.Any(), gomock.Any()).Times(1).
+					Return(
+						&pb.GetContractResponse{
+							Code:  pb.Code_OK_UNSPECIFIED,
+							Error: nil,
+						}, errors.New("FAILED_TO_GET_DEFAULT_CONTRACT"))
+			},
+			checkResponse: func(req *pb.GetClustersRequest, res *pb.GetClustersResponse, err error) {
+				require.Error(t, err)
+				require.Equal(t, res.Code, pb.Code_NOT_FOUND)
+			},
+		},
+		{
 			name: "INVALID_CONTRACT_ID",
 			in: &pb.GetClustersRequest{
 				ContractId: "NO_UUID_STRING",
 			},
+			buildStubs: func(mockContractClient *mocktks.MockContractServiceClient) {},
 			checkResponse: func(req *pb.GetClustersRequest, res *pb.GetClustersResponse, err error) {
 				require.Error(t, err)
 				require.Equal(t, res.Code, pb.Code_INVALID_ARGUMENT)
@@ -198,6 +247,7 @@ func TestGetClusters(t *testing.T) {
 			in: &pb.GetClustersRequest{
 				ContractId: "NO_UUID_STRING",
 			},
+			buildStubs: func(mockContractClient *mocktks.MockContractServiceClient) {},
 			checkResponse: func(req *pb.GetClustersRequest, res *pb.GetClustersResponse, err error) {
 				require.Error(t, err)
 				require.Equal(t, res.Code, pb.Code_INVALID_ARGUMENT)
@@ -209,6 +259,7 @@ func TestGetClusters(t *testing.T) {
 				ContractId: uuid.New().String(),
 				CspId:      uuid.New().String(),
 			},
+			buildStubs: func(mockContractClient *mocktks.MockContractServiceClient) {},
 			checkResponse: func(req *pb.GetClustersRequest, res *pb.GetClustersResponse, err error) {
 				require.Error(t, err)
 				require.Equal(t, res.Code, pb.Code_INVALID_ARGUMENT)
@@ -219,6 +270,7 @@ func TestGetClusters(t *testing.T) {
 			in: &pb.GetClustersRequest{
 				ContractId: uuid.New().String(),
 			},
+			buildStubs: func(mockContractClient *mocktks.MockContractServiceClient) {},
 			checkResponse: func(req *pb.GetClustersRequest, res *pb.GetClustersResponse, err error) {
 				require.Error(t, err)
 				require.Equal(t, res.Code, pb.Code_NOT_FOUND)
@@ -229,6 +281,7 @@ func TestGetClusters(t *testing.T) {
 			in: &pb.GetClustersRequest{
 				CspId: uuid.New().String(),
 			},
+			buildStubs: func(mockContractClient *mocktks.MockContractServiceClient) {},
 			checkResponse: func(req *pb.GetClustersRequest, res *pb.GetClustersResponse, err error) {
 				require.Error(t, err)
 				require.Equal(t, res.Code, pb.Code_NOT_FOUND)
@@ -242,6 +295,14 @@ func TestGetClusters(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			ctx, cancel := context.WithCancel(context.Background())
 			defer cancel()
+
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
+
+			mockContarctClient := mocktks.NewMockContractServiceClient(ctrl)
+			contractClient = mockContarctClient
+
+			tc.buildStubs(mockContarctClient)
 
 			s := ClusterInfoServer{}
 			res, err := s.GetClusters(ctx, tc.in)

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 
@@ -116,17 +117,24 @@ func (s *ClusterInfoServer) GetClusters(ctx context.Context, in *pb.GetClustersR
 	contractId := in.GetContractId()
 	cspId := in.GetCspId()
 
+	// use default contract if both contractId and cspId was not provided
 	if contractId == "" && cspId == "" {
-		err := errors.New("Wrong parameter")
-		res := pb.GetClustersResponse{
-			Code: pb.Code_INVALID_ARGUMENT,
-			Error: &pb.Error{
-				Msg: "Neither contractID or cspId was provided. Exactly one of those must be provided.",
-			},
-			Clusters: nil,
+		contract, err := s.getDefaultContract(ctx)
+		if err != nil {
+			log.Error("Failed to get default contract. err : ", err)
+			return &pb.GetClustersResponse{
+				Code: pb.Code_NOT_FOUND,
+				Error: &pb.Error{
+					Msg: "Failed to get default contract",
+				},
+			}, err
 		}
-		return &res, err
-	} else if contractId != "" && cspId != "" {
+
+		contractId = contract.GetContractId()
+		cspId = "" // get clusters by clusterId
+	}
+
+	if contractId != "" && cspId != "" {
 		err := errors.New("Wrong parameter")
 		res := pb.GetClustersResponse{
 			Code: pb.Code_INVALID_ARGUMENT,
@@ -229,4 +237,14 @@ func (s *ClusterInfoServer) UpdateClusterStatus(ctx context.Context, in *pb.Upda
 		Code:  pb.Code_OK_UNSPECIFIED,
 		Error: nil,
 	}, nil
+}
+
+func (s *ClusterInfoServer) getDefaultContract(ctx context.Context) (*pb.Contract, error) {
+	resContract, err := contractClient.GetDefaultContract(ctx, &empty.Empty{})
+	if err != nil {
+		log.Error("Failed to get contract info err : ", err)
+		return nil, err
+	}
+
+	return resContract.GetContract(), nil
 }

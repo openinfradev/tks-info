@@ -7,6 +7,7 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 
+	"github.com/openinfradev/tks-common/pkg/grpc_client"
 	"github.com/openinfradev/tks-common/pkg/grpc_server"
 	"github.com/openinfradev/tks-common/pkg/log"
 	pb "github.com/openinfradev/tks-proto/tks_pb"
@@ -19,10 +20,16 @@ var (
 	tlsCertPath       string
 	tlsKeyPath        string
 
-	dbhost     string
-	dbport     string
-	dbuser     string
-	dbpassword string
+	contractAddress string
+	contractPort    int
+	dbhost          string
+	dbport          string
+	dbuser          string
+	dbpassword      string
+)
+
+var (
+	contractClient pb.ContractServiceClient
 )
 
 func init() {
@@ -31,6 +38,8 @@ func init() {
 	flag.StringVar(&tlsClientCertPath, "tls-client-cert-path", "../../cert/tks-ca.crt", "path of ca cert file for tls")
 	flag.StringVar(&tlsCertPath, "tls-cert-path", "../../cert/tks-server.crt", "path of cert file for tls")
 	flag.StringVar(&tlsKeyPath, "tls-key-path", "../../cert/tks-server.key", "path of key file for tls")
+	flag.StringVar(&contractAddress, "contract-address", "localhost", "service address for tks-contract")
+	flag.IntVar(&contractPort, "contract-port", 9110, "service port for tks-contract")
 	flag.StringVar(&dbhost, "dbhost", "localhost", "host of postgreSQL")
 	flag.StringVar(&dbport, "dbport", "5432", "port of postgreSQL")
 	flag.StringVar(&dbuser, "dbuser", "postgres", "postgreSQL user")
@@ -46,6 +55,8 @@ func main() {
 	log.Info("tlsClientCertPath : ", tlsClientCertPath)
 	log.Info("tlsCertPath : ", tlsCertPath)
 	log.Info("tlsKeyPath : ", tlsKeyPath)
+	log.Info("contractAddress : ", contractAddress)
+	log.Info("contractPort : ", contractPort)
 	log.Info("dbhost : ", dbhost)
 	log.Info("dbport : ", dbport)
 	log.Info("dbuser : ", dbuser)
@@ -65,6 +76,11 @@ func main() {
 	InitClusterInfoHandler(db)
 	InitCspInfoHandler(db)
 	InitKeycloakInfoHandler(db)
+
+	// initialize clients
+	if _, contractClient, err = grpc_client.CreateContractClient(contractAddress, contractPort, tlsEnabled, tlsClientCertPath); err != nil {
+		log.Fatal("failed to create contract client : ", err)
+	}
 
 	// start server
 	s, conn, err := grpc_server.CreateServer(port, tlsEnabled, tlsCertPath, tlsKeyPath)
