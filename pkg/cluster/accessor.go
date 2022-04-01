@@ -79,6 +79,7 @@ func (x *ClusterAccessor) CreateClusterInfo(contractId uuid.UUID, cspId uuid.UUI
 		CspID:        cspId,
 		Name:         name,
 		Status:       pb.ClusterStatus_UNSPECIFIED,
+		StatusDesc:   "",
 		SshKeyName:   conf.SshKeyName,
 		Region:       conf.Region,
 		NumOfAz:      conf.NumOfAz,
@@ -97,10 +98,10 @@ func (x *ClusterAccessor) CreateClusterInfo(contractId uuid.UUID, cspId uuid.UUI
 }
 
 // UpdateStatus updates an status of cluster for Cluster.
-func (x *ClusterAccessor) UpdateStatus(id uuid.UUID, status pb.ClusterStatus) error {
+func (x *ClusterAccessor) UpdateStatus(id uuid.UUID, status pb.ClusterStatus, statusDesc string, workflowId string) error {
 	res := x.db.Model(&model.Cluster{}).
 		Where("ID = ?", id).
-		Update("Status", status)
+		Updates(map[string]interface{}{"Status": status, "StatusDesc": statusDesc, "WorkflowId": workflowId})
 
 	if res.Error != nil || res.RowsAffected == 0 {
 		return fmt.Errorf("nothing updated in cluster with id %s", id.String())
@@ -123,8 +124,10 @@ func ConvertToPbCluster(cluster model.Cluster) *pb.Cluster {
 		Id:         cluster.ID.String(),
 		Name:       cluster.Name,
 		CreatedAt:  timestamppb.New(cluster.CreatedAt),
-		UpdatedAt:  timestamppb.New(cluster.CreatedAt),
+		UpdatedAt:  timestamppb.New(cluster.UpdatedAt),
+		WorkflowId: cluster.WorkflowId,
 		Status:     cluster.Status,
+		StatusDesc: cluster.StatusDesc,
 		ContractId: cluster.ContractID.String(),
 		CspId:      cluster.CspID.String(),
 		Kubeconfig: cluster.Kubeconfig,

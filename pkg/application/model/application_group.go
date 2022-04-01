@@ -13,7 +13,9 @@ type ApplicationGroup struct {
 	ID            uuid.UUID `gorm:"primarykey;type:uuid;default:uuid_generate_v4()"`
 	Name          string
 	Type          pb.AppGroupType
+	WorkflowId    string
 	Status        pb.AppGroupStatus
+	StatusDesc    string
 	ClusterId     uuid.UUID `gorm:"type:uuid;"`
 	ExternalLabel string
 	UpdatedAt     time.Time

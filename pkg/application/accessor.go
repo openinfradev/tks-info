@@ -103,10 +103,10 @@ func (x *Accessor) GetAppGroup(appGroupID uuid.UUID) (*pb.AppGroup, error) {
 }
 
 // UpdateAppGroupStatus updates status of application group.
-func (x *Accessor) UpdateAppGroupStatus(appGroupID uuid.UUID, status pb.AppGroupStatus) error {
+func (x *Accessor) UpdateAppGroupStatus(appGroupID uuid.UUID, status pb.AppGroupStatus, statusDesc string, workflowId string) error {
 	res := x.db.Model(&model.ApplicationGroup{}).
 		Where("id = ?", appGroupID).
-		Update("status", status)
+		Updates(map[string]interface{}{"Status": status, "StatusDesc": statusDesc, "WorkflowId": workflowId})
 
 	if res.Error != nil {
 		return res.Error
