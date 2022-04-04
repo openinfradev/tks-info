@@ -2,10 +2,11 @@ package cluster
 
 import (
 	"fmt"
+	_ "time"
+
 	uuid "github.com/google/uuid"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"gorm.io/gorm"
-	_ "time"
 
 	_ "github.com/openinfradev/tks-common/pkg/log"
 	model "github.com/openinfradev/tks-info/pkg/cluster/model"
@@ -83,6 +84,7 @@ func (x *ClusterAccessor) CreateClusterInfo(contractId uuid.UUID, cspId uuid.UUI
 		ContractID:   contractId,
 		CspID:        cspId,
 		Name:         name,
+		WorkflowId:   "",
 		Status:       pb.ClusterStatus_UNSPECIFIED,
 		StatusDesc:   "",
 		SshKeyName:   conf.SshKeyName,
