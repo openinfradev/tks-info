@@ -208,8 +208,8 @@ func TestGetClusters(t *testing.T) {
 						}, nil)
 			},
 			checkResponse: func(req *pb.GetClustersRequest, res *pb.GetClustersResponse, err error) {
-				require.Error(t, err)
-				require.Equal(t, res.Code, pb.Code_NOT_FOUND)
+				require.NoError(t, err)
+				require.Equal(t, res.Code, pb.Code_OK_UNSPECIFIED)
 			},
 		},
 		{
@@ -272,8 +272,8 @@ func TestGetClusters(t *testing.T) {
 			},
 			buildStubs: func(mockContractClient *mocktks.MockContractServiceClient) {},
 			checkResponse: func(req *pb.GetClustersRequest, res *pb.GetClustersResponse, err error) {
-				require.Error(t, err)
-				require.Equal(t, res.Code, pb.Code_NOT_FOUND)
+				require.NoError(t, err)
+				require.Equal(t, res.Code, pb.Code_OK_UNSPECIFIED)
 			},
 		},
 		{
