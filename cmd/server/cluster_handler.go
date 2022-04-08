@@ -224,7 +224,7 @@ func (s *ClusterInfoServer) UpdateClusterStatus(ctx context.Context, in *pb.Upda
 		return &res, err
 	}
 
-	err = clusterAccessor.UpdateStatus(clusterId, in.GetStatus())
+	err = clusterAccessor.UpdateStatus(clusterId, in.GetStatus(), in.GetStatusDesc(), in.GetWorkflowId())
 	if err != nil {
 		return &pb.SimpleResponse{
 			Code: pb.Code_INTERNAL,

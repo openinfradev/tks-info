@@ -2,10 +2,11 @@ package cluster
 
 import (
 	"fmt"
+	_ "time"
+
 	uuid "github.com/google/uuid"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"gorm.io/gorm"
-	_ "time"
 
 	_ "github.com/openinfradev/tks-common/pkg/log"
 	model "github.com/openinfradev/tks-info/pkg/cluster/model"
@@ -42,15 +43,20 @@ func (x *ClusterAccessor) GetClustersByContractID(contractId uuid.UUID) ([]*pb.C
 
 	res := x.db.Find(&clusters, "contract_id = ?", contractId)
 
-	if res.RowsAffected == 0 || res.Error != nil {
-		return nil, fmt.Errorf("Could not find clusters with contractID: %s", contractId)
+	if res.Error != nil {
+		return nil, fmt.Errorf("Error while finding clusters with contractID: %s", contractId)
 	}
 
 	pbClusters := []*pb.Cluster{}
+
+	// If no record is found, just return empty array.
+	if res.RowsAffected == 0 {
+		return pbClusters, nil
+	}
+
 	for _, cluster := range clusters {
 		pbClusters = append(pbClusters, ConvertToPbCluster(cluster))
 	}
-
 	return pbClusters, nil
 }
 
@@ -78,7 +84,9 @@ func (x *ClusterAccessor) CreateClusterInfo(contractId uuid.UUID, cspId uuid.UUI
 		ContractID:   contractId,
 		CspID:        cspId,
 		Name:         name,
+		WorkflowId:   "",
 		Status:       pb.ClusterStatus_UNSPECIFIED,
+		StatusDesc:   "",
 		SshKeyName:   conf.SshKeyName,
 		Region:       conf.Region,
 		NumOfAz:      conf.NumOfAz,
@@ -97,10 +105,10 @@ func (x *ClusterAccessor) CreateClusterInfo(contractId uuid.UUID, cspId uuid.UUI
 }
 
 // UpdateStatus updates an status of cluster for Cluster.
-func (x *ClusterAccessor) UpdateStatus(id uuid.UUID, status pb.ClusterStatus) error {
+func (x *ClusterAccessor) UpdateStatus(id uuid.UUID, status pb.ClusterStatus, statusDesc string, workflowId string) error {
 	res := x.db.Model(&model.Cluster{}).
 		Where("ID = ?", id).
-		Update("Status", status)
+		Updates(map[string]interface{}{"Status": status, "StatusDesc": statusDesc, "WorkflowId": workflowId})
 
 	if res.Error != nil || res.RowsAffected == 0 {
 		return fmt.Errorf("nothing updated in cluster with id %s", id.String())
@@ -123,8 +131,10 @@ func ConvertToPbCluster(cluster model.Cluster) *pb.Cluster {
 		Id:         cluster.ID.String(),
 		Name:       cluster.Name,
 		CreatedAt:  timestamppb.New(cluster.CreatedAt),
-		UpdatedAt:  timestamppb.New(cluster.CreatedAt),
+		UpdatedAt:  timestamppb.New(cluster.UpdatedAt),
+		WorkflowId: cluster.WorkflowId,
 		Status:     cluster.Status,
+		StatusDesc: cluster.StatusDesc,
 		ContractId: cluster.ContractID.String(),
 		CspId:      cluster.CspID.String(),
 		Kubeconfig: cluster.Kubeconfig,

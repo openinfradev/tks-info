@@ -154,7 +154,7 @@ func (*AppInfoServer) UpdateAppGroupStatus(ctx context.Context, in *pb.UpdateApp
 		}, err
 	}
 	log.Info("UpdateAppGroupStatus request for app group ID: ", appGroupID)
-	if err = acc.UpdateAppGroupStatus(appGroupID, in.GetStatus()); err != nil {
+	if err = acc.UpdateAppGroupStatus(appGroupID, in.GetStatus(), in.GetStatusDesc(), in.GetWorkflowId()); err != nil {
 		return &pb.SimpleResponse{
 			Code: pb.Code_INTERNAL,
 			Error: &pb.Error{

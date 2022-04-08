@@ -118,7 +118,7 @@ func TestGetClustersByCspID(t *testing.T) {
 }
 
 func TestUpdateStatus(t *testing.T) {
-	err := clusterAccessor.UpdateStatus(clusterId, pb.ClusterStatus_INSTALLING)
+	err := clusterAccessor.UpdateStatus(clusterId, pb.ClusterStatus_INSTALLING, "", "")
 	if err != nil {
 		t.Errorf("An error occurred while updating cluster status. Err: %s", err)
 	}

@@ -14,7 +14,9 @@ type Cluster struct {
 	Name         string
 	ContractID   uuid.UUID
 	CspID        uuid.UUID
+	WorkflowId   string
 	Status       pb.ClusterStatus
+	StatusDesc   string
 	SshKeyName   string
 	Region       string
 	NumOfAz      int32

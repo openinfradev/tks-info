@@ -129,7 +129,7 @@ func TestGetAppGroup(t *testing.T) {
 	t.Logf("matching app group name: %s", appGroup.AppGroupName)
 }
 func TestUpdateAppGroupStatus(t *testing.T) {
-	if err := accessor.UpdateAppGroupStatus(appGroupID, pb.AppGroupStatus_APP_GROUP_RUNNING); err != nil {
+	if err := accessor.UpdateAppGroupStatus(appGroupID, pb.AppGroupStatus_APP_GROUP_RUNNING, "", ""); err != nil {
 		t.Errorf("an error was unexpected while update application group: %s", err)
 	}
 
