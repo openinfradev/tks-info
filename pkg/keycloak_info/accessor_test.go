@@ -25,7 +25,7 @@ var (
 var (
 	testDBHost string
 	testDBPort string
-	err error
+	err        error
 )
 
 func init() {
