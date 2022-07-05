@@ -15,7 +15,7 @@ type Application struct {
 	Endpoint   string
 	Metadata   datatypes.JSON
 	Type       pb.AppType
-	AppGroupId uuid.UUID `gorm:"type:uuid;"`
+	AppGroupId string
 	UpdatedAt  time.Time
 	CreatedAt  time.Time
 }

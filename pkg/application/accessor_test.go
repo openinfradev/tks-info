@@ -20,7 +20,7 @@ import (
 )
 
 var (
-	clusterID  uuid.UUID
+	clusterID  string
 	appGroupID uuid.UUID
 	appName    string
 	accessor   *application.Accessor
@@ -32,7 +32,7 @@ var (
 )
 
 func init() {
-	clusterID = uuid.New()
+	clusterID = helper.GenerateClusterId()
 
 	log.Disable()
 }

@@ -4,9 +4,9 @@ import (
 	"context"
 	"testing"
 
-	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
 
+	"github.com/openinfradev/tks-common/pkg/helper"
 	pb "github.com/openinfradev/tks-proto/tks_pb"
 )
 
@@ -34,10 +34,10 @@ func TestCreateAppGroup(t *testing.T) {
 				require.NoError(t, err)
 				require.Equal(t, res.Code, pb.Code_OK_UNSPECIFIED)
 
-				_createdAppGroupId, err := uuid.Parse(res.Id)
-				require.NoError(t, err)
+				_createdAppGroupId := res.Id
+				require.True(t, helper.ValidateApplicationGroupId(_createdAppGroupId))
 
-				createdAppGroupId = _createdAppGroupId.String()
+				createdAppGroupId = _createdAppGroupId
 				requestCreateAppGroup.AppGroup.AppGroupId = createdAppGroupId
 				t.Logf("createdAppGroupId : %s", createdAppGroupId)
 			},
@@ -110,7 +110,7 @@ func TestGetAppGroupsByClusterID(t *testing.T) {
 		{
 			name: "NOTE_EXIST_APPGROUPS",
 			in: &pb.IDRequest{
-				Id: uuid.New().String(),
+				Id: helper.GenerateClusterId(),
 			},
 			checkResponse: func(req *pb.IDRequest, res *pb.GetAppGroupsResponse, err error) {
 				require.NoError(t, err)
@@ -238,7 +238,7 @@ func TestGetAppGroup(t *testing.T) {
 		{
 			name: "NO_APPGROUP_ID",
 			in: &pb.GetAppGroupRequest{
-				AppGroupId: uuid.New().String(),
+				AppGroupId: helper.GenerateApplicaionGroupId(),
 			},
 			checkResponse: func(req *pb.GetAppGroupRequest, res *pb.GetAppGroupResponse, err error) {
 				require.Error(t, err)
@@ -277,8 +277,8 @@ func TestUpdateAppGroupStatus(t *testing.T) {
 				require.NoError(t, err)
 				require.Equal(t, res.Code, pb.Code_OK_UNSPECIFIED)
 
-				appGroupId, err := uuid.Parse(req.GetAppGroupId())
-				require.NoError(t, err)
+				appGroupId := req.GetAppGroupId()
+				require.True(t, helper.ValidateApplicationGroupId(appGroupId))
 
 				appGroup, err := acc.GetAppGroup(appGroupId)
 				require.NoError(t, err)
@@ -300,7 +300,7 @@ func TestUpdateAppGroupStatus(t *testing.T) {
 		{
 			name: "NO_APPGROUP_ID",
 			in: &pb.UpdateAppGroupStatusRequest{
-				AppGroupId: uuid.New().String(),
+				AppGroupId: helper.GenerateApplicaionGroupId(),
 			},
 			checkResponse: func(req *pb.UpdateAppGroupStatusRequest, res *pb.SimpleResponse, err error) {
 				require.Error(t, err)
@@ -355,7 +355,7 @@ func TestUpdateApp(t *testing.T) {
 		{
 			name: "NO_EXIST_APPGROUP_ID",
 			in: &pb.UpdateAppRequest{
-				AppGroupId: uuid.New().String(),
+				AppGroupId: helper.GenerateApplicaionGroupId(),
 			},
 			checkResponse: func(req *pb.UpdateAppRequest, res *pb.SimpleResponse, err error) {
 				require.Error(t, err)
@@ -420,7 +420,7 @@ func TestGetAppsByAppGroupID(t *testing.T) {
 		{
 			name: "NO_APPGROUP_ID",
 			in: &pb.IDRequest{
-				Id: uuid.New().String(),
+				Id: helper.GenerateApplicaionGroupId(),
 			},
 			checkResponse: func(req *pb.IDRequest, res *pb.GetAppsResponse, err error) {
 				require.Error(t, err)
@@ -458,8 +458,8 @@ func TestDeleteAppGroup(t *testing.T) {
 				require.NoError(t, err)
 				require.Equal(t, res.Code, pb.Code_OK_UNSPECIFIED)
 
-				appGroupId, err := uuid.Parse(req.GetAppGroupId())
-				require.NoError(t, err)
+				appGroupId := req.GetAppGroupId()
+				require.True(t, helper.ValidateApplicationGroupId(appGroupId))
 
 				appGroup, err := acc.GetAppGroup(appGroupId)
 				require.Error(t, err)
@@ -479,7 +479,7 @@ func TestDeleteAppGroup(t *testing.T) {
 		{
 			name: "NO_APPGROUP_ID",
 			in: &pb.DeleteAppGroupRequest{
-				AppGroupId: uuid.New().String(),
+				AppGroupId: helper.GenerateApplicaionGroupId(),
 			},
 			checkResponse: func(req *pb.DeleteAppGroupRequest, res *pb.SimpleResponse, err error) {
 				require.Error(t, err)
@@ -506,12 +506,12 @@ func TestDeleteAppGroup(t *testing.T) {
 
 func randomCreateAppGroupRequest() *pb.CreateAppGroupRequest {
 	return &pb.CreateAppGroupRequest{
-		ClusterId: uuid.New().String(),
+		ClusterId: helper.GenerateClusterId(),
 		AppGroup: &pb.AppGroup{
-			AppGroupId:    uuid.New().String(),
+			AppGroupId:    helper.GenerateApplicaionGroupId(),
 			AppGroupName:  randomString("APPGROUPNAME"),
 			Type:          pb.AppGroupType_APP_TYPE_UNSPECIFIED,
-			ClusterId:     uuid.New().String(),
+			ClusterId:     helper.GenerateClusterId(),
 			Status:        pb.AppGroupStatus_APP_GROUP_UNSPECIFIED,
 			ExternalLabel: randomString("EXTERNALLABEL"),
 		},

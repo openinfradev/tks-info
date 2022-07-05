@@ -7,6 +7,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
 
+	"github.com/openinfradev/tks-common/pkg/helper"
 	pb "github.com/openinfradev/tks-proto/tks_pb"
 )
 
@@ -106,7 +107,7 @@ func TestGetKeycloakInfoByClusterId(t *testing.T) {
 		{
 			name: "INTERNAL_NO_KEYCLOAK_BY_CLUSTER_ID",
 			in: &pb.IDRequest{
-				Id: uuid.New().String(),
+				Id: helper.GenerateClusterId(),
 			},
 			checkResponse: func(req *pb.IDRequest, res *pb.GetKeycloakInfoResponse, err error) {
 				require.Error(t, err)
@@ -134,7 +135,7 @@ func TestGetKeycloakInfoByClusterId(t *testing.T) {
 
 func randomCreateKeycloakRequest() *pb.CreateKeycloakInfoRequest {
 	return &pb.CreateKeycloakInfoRequest{
-		ClusterId:  uuid.New().String(),
+		ClusterId:  helper.GenerateClusterId(),
 		Realm:      randomString("Realm"),
 		ClientId:   randomString("ClientId"),
 		Secret:     randomString("Secret"),

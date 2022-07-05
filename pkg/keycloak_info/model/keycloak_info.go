@@ -10,7 +10,7 @@ import (
 // KeycloakInfo represents a KeycloakInfo data in Database.
 type KeycloakInfo struct {
 	Id         uuid.UUID `gorm:"primarykey;type:uuid;default:uuid_generate_v4()"`
-	ClusterId  uuid.UUID
+	ClusterId  string
 	Realm      string
 	ClientId   string
 	Secret     string

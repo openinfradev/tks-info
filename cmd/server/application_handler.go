@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/google/uuid"
 	"gorm.io/gorm"
 
+	"github.com/openinfradev/tks-common/pkg/helper"
 	"github.com/openinfradev/tks-common/pkg/log"
 	"github.com/openinfradev/tks-info/pkg/application"
 	app "github.com/openinfradev/tks-info/pkg/application"
@@ -24,16 +24,16 @@ func InitAppInfoHandler(db *gorm.DB) {
 }
 
 func (s *AppInfoServer) CreateAppGroup(ctx context.Context, in *pb.CreateAppGroupRequest) (*pb.IDResponse, error) {
-	clusterID, err := uuid.Parse(in.GetClusterId())
-	if err != nil {
-		res := pb.IDResponse{
+	clusterID := in.GetClusterId()
+	if !helper.ValidateClusterId(clusterID) {
+		return &pb.IDResponse{
 			Code: pb.Code_INVALID_ARGUMENT,
 			Error: &pb.Error{
-				Msg: fmt.Sprintf("invalid cluster ID %s", in.GetClusterId()),
+				Msg: fmt.Sprintf("invalid cluster ID %s", clusterID),
 			},
-		}
-		return &res, err
+		}, fmt.Errorf("invalid cluster ID %s", clusterID)
 	}
+
 	log.Info("Request 'CreateAppGroup' for cluster id ", clusterID)
 	appGroup := in.GetAppGroup()
 
@@ -50,20 +50,20 @@ func (s *AppInfoServer) CreateAppGroup(ctx context.Context, in *pb.CreateAppGrou
 	res := &pb.IDResponse{
 		Code:  pb.Code_OK_UNSPECIFIED,
 		Error: nil,
-		Id:    id.String(),
+		Id:    id,
 	}
 	return res, nil
 }
 
 func (s *AppInfoServer) GetAppGroupsByClusterID(ctx context.Context, in *pb.IDRequest) (*pb.GetAppGroupsResponse, error) {
-	clusterID, err := uuid.Parse(in.GetId())
-	if err != nil {
+	clusterID := in.GetId()
+	if !helper.ValidateClusterId(clusterID) {
 		return &pb.GetAppGroupsResponse{
 			Code: pb.Code_INVALID_ARGUMENT,
 			Error: &pb.Error{
-				Msg: fmt.Sprintf("invalid app group ID %s", in.GetId()),
+				Msg: fmt.Sprintf("invalid cluster ID %s", clusterID),
 			},
-		}, err
+		}, fmt.Errorf("invalid cluster ID %s", clusterID)
 	}
 	log.Info("GetAppGroupsByClusterID request for clusterId: ", clusterID)
 
@@ -115,15 +115,16 @@ func (s *AppInfoServer) GetAppGroups(ctx context.Context, in *pb.GetAppGroupsReq
 }
 
 func (s *AppInfoServer) GetAppGroup(ctx context.Context, in *pb.GetAppGroupRequest) (*pb.GetAppGroupResponse, error) {
-	appGroupID, err := uuid.Parse(in.GetAppGroupId())
-	if err != nil {
+	appGroupID := in.GetAppGroupId()
+	if !helper.ValidateApplicationGroupId(appGroupID) {
 		return &pb.GetAppGroupResponse{
 			Code: pb.Code_INVALID_ARGUMENT,
 			Error: &pb.Error{
 				Msg: fmt.Sprintf("invalid app group ID %s", in.GetAppGroupId()),
 			},
-		}, err
+		}, fmt.Errorf("invalid app group ID %s", in.GetAppGroupId())
 	}
+
 	log.Info("GetAppGroup request for app group ID: ", appGroupID)
 	appGroup, err := acc.GetAppGroup(appGroupID)
 	if err != nil {
@@ -144,17 +145,18 @@ func (s *AppInfoServer) GetAppGroup(ctx context.Context, in *pb.GetAppGroupReque
 }
 
 func (*AppInfoServer) UpdateAppGroupStatus(ctx context.Context, in *pb.UpdateAppGroupStatusRequest) (*pb.SimpleResponse, error) {
-	appGroupID, err := uuid.Parse(in.GetAppGroupId())
-	if err != nil {
+	appGroupID := in.GetAppGroupId()
+	if !helper.ValidateApplicationGroupId(appGroupID) {
 		return &pb.SimpleResponse{
 			Code: pb.Code_INVALID_ARGUMENT,
 			Error: &pb.Error{
 				Msg: fmt.Sprintf("invalid app group ID %s", in.GetAppGroupId()),
 			},
-		}, err
+		}, fmt.Errorf("invalid app group ID %s", in.GetAppGroupId())
 	}
+
 	log.Info("UpdateAppGroupStatus request for app group ID: ", appGroupID)
-	if err = acc.UpdateAppGroupStatus(appGroupID, in.GetStatus(), in.GetStatusDesc(), in.GetWorkflowId()); err != nil {
+	if err := acc.UpdateAppGroupStatus(appGroupID, in.GetStatus(), in.GetStatusDesc(), in.GetWorkflowId()); err != nil {
 		return &pb.SimpleResponse{
 			Code: pb.Code_INTERNAL,
 			Error: &pb.Error{
@@ -169,17 +171,17 @@ func (*AppInfoServer) UpdateAppGroupStatus(ctx context.Context, in *pb.UpdateApp
 }
 
 func (s *AppInfoServer) DeleteAppGroup(ctx context.Context, in *pb.DeleteAppGroupRequest) (*pb.SimpleResponse, error) {
-	appGroupID, err := uuid.Parse(in.GetAppGroupId())
-	if err != nil {
+	appGroupID := in.GetAppGroupId()
+	if !helper.ValidateApplicationGroupId(appGroupID) {
 		return &pb.SimpleResponse{
 			Code: pb.Code_INVALID_ARGUMENT,
 			Error: &pb.Error{
 				Msg: fmt.Sprintf("invalid app group ID %s", in.GetAppGroupId()),
 			},
-		}, err
+		}, fmt.Errorf("invalid app group ID %s", in.GetAppGroupId())
 	}
 	log.Info("DeleteAppGroup request for app group ID: ", appGroupID)
-	if err = acc.DeleteAppGroup(appGroupID); err != nil {
+	if err := acc.DeleteAppGroup(appGroupID); err != nil {
 		return &pb.SimpleResponse{
 			Code: pb.Code_INTERNAL,
 			Error: &pb.Error{
@@ -194,14 +196,14 @@ func (s *AppInfoServer) DeleteAppGroup(ctx context.Context, in *pb.DeleteAppGrou
 }
 
 func (*AppInfoServer) GetAppsByAppGroupID(ctx context.Context, in *pb.IDRequest) (*pb.GetAppsResponse, error) {
-	appGroupID, err := uuid.Parse(in.GetId())
-	if err != nil {
+	appGroupID := in.GetId()
+	if !helper.ValidateApplicationGroupId(appGroupID) {
 		return &pb.GetAppsResponse{
 			Code: pb.Code_INVALID_ARGUMENT,
 			Error: &pb.Error{
 				Msg: fmt.Sprintf("invalid app group ID %s", in.GetId()),
 			},
-		}, err
+		}, fmt.Errorf("invalid app group ID %s", in.GetId())
 	}
 	log.Info("GetAppsByAppGroupID request for app group ID: ", appGroupID)
 	apps, err := acc.GetAppsByAppGroupID(appGroupID)
@@ -221,15 +223,16 @@ func (*AppInfoServer) GetAppsByAppGroupID(ctx context.Context, in *pb.IDRequest)
 }
 
 func (*AppInfoServer) GetApps(ctx context.Context, in *pb.GetAppsRequest) (*pb.GetAppsResponse, error) {
-	appGroupID, err := uuid.Parse(in.GetAppGroupId())
-	if err != nil {
+	appGroupID := in.GetAppGroupId()
+	if !helper.ValidateApplicationGroupId(appGroupID) {
 		return &pb.GetAppsResponse{
 			Code: pb.Code_INVALID_ARGUMENT,
 			Error: &pb.Error{
 				Msg: fmt.Sprintf("invalid app group ID %s", in.GetAppGroupId()),
 			},
-		}, err
+		}, fmt.Errorf("invalid app group ID %s", in.GetAppGroupId())
 	}
+
 	log.Info("GetApps request for app group ID: ", appGroupID)
 	apps, err := acc.GetApps(appGroupID, in.GetType())
 	if err != nil {
@@ -248,18 +251,18 @@ func (*AppInfoServer) GetApps(ctx context.Context, in *pb.GetAppsRequest) (*pb.G
 }
 
 func (*AppInfoServer) UpdateApp(ctx context.Context, in *pb.UpdateAppRequest) (*pb.SimpleResponse, error) {
-	appGroupID, err := uuid.Parse(in.GetAppGroupId())
-	if err != nil {
+	appGroupID := in.GetAppGroupId()
+	if !helper.ValidateApplicationGroupId(appGroupID) {
 		return &pb.SimpleResponse{
 			Code: pb.Code_INVALID_ARGUMENT,
 			Error: &pb.Error{
 				Msg: fmt.Sprintf("invalid app group ID %s", in.GetAppGroupId()),
 			},
-		}, err
+		}, fmt.Errorf("invalid app group ID %s", in.GetAppGroupId())
 	}
 	log.Info("UpdateApp request for app group ID: ", appGroupID)
 	log.Info(">>> endpoint: ", in.GetEndpoint())
-	if err = acc.UpdateApp(appGroupID, in.GetAppType(), in.GetEndpoint(), in.GetMetadata()); err != nil {
+	if err := acc.UpdateApp(appGroupID, in.GetAppType(), in.GetEndpoint(), in.GetMetadata()); err != nil {
 		return &pb.SimpleResponse{
 			Code: pb.Code_INTERNAL,
 			Error: &pb.Error{

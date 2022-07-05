@@ -20,9 +20,9 @@ import (
 )
 
 var (
-	clusterId       uuid.UUID
+	clusterId       string
 	cspId           uuid.UUID
-	contractId      uuid.UUID
+	contractId      string
 	clusterAccessor *cluster.ClusterAccessor
 	clusterName     string
 )
@@ -34,7 +34,7 @@ var (
 )
 
 func init() {
-	contractId = uuid.New()
+	contractId = helper.GenerateContractId()
 	cspId = uuid.New()
 	clusterName = "testCluster"
 
@@ -93,7 +93,7 @@ func TestCreateClusterInfo(t *testing.T) {
 		t.Errorf("An error occurred while creating new clusterInfo. Err: %s", err)
 	}
 
-	t.Logf("Created clusterID: %s", clusterId.String())
+	t.Logf("Created clusterID: %s", clusterId)
 }
 
 func TestGetCluster(t *testing.T) {

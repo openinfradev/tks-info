@@ -7,6 +7,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
 
+	"github.com/openinfradev/tks-common/pkg/helper"
 	pb "github.com/openinfradev/tks-proto/tks_pb"
 )
 
@@ -163,7 +164,7 @@ func TestGetCSPIDsByContractID(t *testing.T) {
 		{
 			name: "NOT_EXIST_CONTRACT_ID",
 			in: &pb.IDRequest{
-				Id: uuid.New().String(),
+				Id: helper.GenerateContractId(),
 			},
 			checkResponse: func(req *pb.IDRequest, res *pb.IDsResponse, err error) {
 				require.Error(t, err)
@@ -299,7 +300,7 @@ func TestGetCSPAuth(t *testing.T) {
 
 func randomCreateCSPInfoRequest() *pb.CreateCSPInfoRequest {
 	return &pb.CreateCSPInfoRequest{
-		ContractId: uuid.New().String(),
+		ContractId: helper.GenerateContractId(),
 		CspName:    randomString("cspname"),
 		Auth:       "premkey",
 		CspType:    pb.CspType_AWS,

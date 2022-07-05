@@ -11,7 +11,7 @@ import (
 // CSPInfo represents a CSPInfo data in Database.
 type CSPInfo struct {
 	ID         uuid.UUID `gorm:"primarykey;type:uuid;default:uuid_generate_v4()"`
-	ContractID uuid.UUID
+	ContractID string
 	Name       string
 	Auth       string
 	CspType    pb.CspType

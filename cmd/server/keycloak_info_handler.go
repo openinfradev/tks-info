@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/google/uuid"
 	"gorm.io/gorm"
 
+	"github.com/openinfradev/tks-common/pkg/helper"
 	"github.com/openinfradev/tks-common/pkg/log"
 	"github.com/openinfradev/tks-info/pkg/keycloak_info"
 	pb "github.com/openinfradev/tks-proto/tks_pb"
@@ -27,14 +27,14 @@ func InitKeycloakInfoHandler(db *gorm.DB) {
 func (s *KeycloakInfoServer) CreateKeycloakInfo(ctx context.Context, in *pb.CreateKeycloakInfoRequest) (*pb.IDResponse, error) {
 	log.Info("Request 'CreateKeycloakInfo' ")
 
-	clusterId, err := uuid.Parse(in.GetClusterId())
-	if err != nil {
+	clusterId := in.GetClusterId()
+	if !helper.ValidateClusterId(clusterId) {
 		return &pb.IDResponse{
 			Code: pb.Code_INVALID_ARGUMENT,
 			Error: &pb.Error{
-				Msg: fmt.Sprintf("invalid cluster ID %s", in.GetClusterId()),
+				Msg: fmt.Sprintf("invalid cluster ID %s", clusterId),
 			},
-		}, err
+		}, fmt.Errorf("invalid cluster ID %s", clusterId)
 	}
 
 	id, err := keycloakInfoAccessor.Create(clusterId, in.GetRealm(), in.GetClientId(), in.GetSecret(), in.GetPrivateKey())
@@ -56,15 +56,14 @@ func (s *KeycloakInfoServer) CreateKeycloakInfo(ctx context.Context, in *pb.Crea
 
 func (s *KeycloakInfoServer) GetKeycloakInfoByClusterId(ctx context.Context, in *pb.IDRequest) (*pb.GetKeycloakInfoResponse, error) {
 	log.Info("Request 'GetKeycloakInfoByClusterId' clusterId ", in.GetId())
-
-	clusterId, err := uuid.Parse(in.GetId())
-	if err != nil {
+	clusterId := in.GetId()
+	if !helper.ValidateClusterId(clusterId) {
 		return &pb.GetKeycloakInfoResponse{
 			Code: pb.Code_INVALID_ARGUMENT,
 			Error: &pb.Error{
 				Msg: fmt.Sprintf("Invalid cluster ID %s", in.GetId()),
 			},
-		}, err
+		}, fmt.Errorf("invalid cluster ID %s", clusterId)
 	}
 
 	keycloakInfos, err := keycloakInfoAccessor.GetKeycloakInfos(clusterId)

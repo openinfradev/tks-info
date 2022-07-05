@@ -2,7 +2,7 @@
 CREATE TABLE csp_infos
 (
     id uuid primary key,
-    contract_id uuid,
+    contract_id character varying(10) COLLATE pg_catalog."default",
     name character varying(50) COLLATE pg_catalog."default",
     auth character varying(200) COLLATE pg_catalog."default",
     csp_type integer,

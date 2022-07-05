@@ -1,9 +1,9 @@
 \c tks;
 CREATE TABLE clusters
 (
+    id character varying(10) primary key,
     name character varying(50) COLLATE pg_catalog."default",
-    id uuid primary key,
-    contract_id uuid,
+    contract_id character varying(10) COLLATE pg_catalog."default",
     csp_id uuid,
     workflow_id character varying(100) COLLATE pg_catalog."default",
     status bigint,

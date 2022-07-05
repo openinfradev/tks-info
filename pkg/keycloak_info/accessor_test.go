@@ -18,7 +18,7 @@ import (
 
 var (
 	Id                   uuid.UUID
-	clusterId            uuid.UUID
+	clusterId            string
 	keycloakInfoAccessor *keycloak_info.KeycloakInfoAccessor
 )
 
@@ -29,7 +29,7 @@ var (
 )
 
 func init() {
-	clusterId = uuid.New()
+	clusterId = helper.GenerateClusterId()
 
 	log.Disable()
 }

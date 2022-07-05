@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/google/uuid"
 	"github.com/openinfradev/tks-common/pkg/log"
 	"github.com/openinfradev/tks-info/pkg/application/model"
 	pb "github.com/openinfradev/tks-proto/tks_pb"
@@ -26,13 +25,13 @@ func New(db *gorm.DB) *Accessor {
 }
 
 // Create creates a new application group in database.
-func (x *Accessor) Create(clusterID uuid.UUID, appGroup *pb.AppGroup) (uuid.UUID, error) {
+func (x *Accessor) Create(clusterID string, appGroup *pb.AppGroup) (string, error) {
 	existsLabel, err := x.existsExternalLabel(clusterID, appGroup.GetExternalLabel())
 	if err != nil {
-		return uuid.Nil, err
+		return "", err
 	}
 	if existsLabel {
-		return uuid.Nil,
+		return "",
 			fmt.Errorf("can't create application group because external label %s already exists",
 				appGroup.GetExternalLabel())
 	}
@@ -45,13 +44,13 @@ func (x *Accessor) Create(clusterID uuid.UUID, appGroup *pb.AppGroup) (uuid.UUID
 	}
 	res := x.db.Create(&appGroupModel)
 	if res.Error != nil {
-		return uuid.Nil, res.Error
+		return "", res.Error
 	}
 	return appGroupModel.ID, nil
 }
 
 // GetApplicatiionGroup returns an application group in database.
-func (x *Accessor) GetAppGroupsByClusterID(clusterID uuid.UUID, offset, limit int) ([]*pb.AppGroup, error) {
+func (x *Accessor) GetAppGroupsByClusterID(clusterID string, offset, limit int) ([]*pb.AppGroup, error) {
 	var appGroupModels []model.ApplicationGroup
 	res := x.db.Offset(offset).Limit(limit).Where("cluster_id = ?", clusterID).Find(&appGroupModels)
 	if res.Error != nil {
@@ -89,9 +88,9 @@ func (x *Accessor) GetAppGroups(name string, appGroupType pb.AppGroupType) ([]*p
 }
 
 // GetAppGroup returns an application group by cluster_id and app_group_id.
-func (x *Accessor) GetAppGroup(appGroupID uuid.UUID) (*pb.AppGroup, error) {
+func (x *Accessor) GetAppGroup(appGroupID string) (*pb.AppGroup, error) {
 	var appGroupModel model.ApplicationGroup
-	res := x.db.First(&appGroupModel, appGroupID)
+	res := x.db.First(&appGroupModel, "id = ?", appGroupID)
 
 	if res.Error != nil && errors.Is(res.Error, gorm.ErrRecordNotFound) {
 		return nil, fmt.Errorf(
@@ -103,7 +102,7 @@ func (x *Accessor) GetAppGroup(appGroupID uuid.UUID) (*pb.AppGroup, error) {
 }
 
 // UpdateAppGroupStatus updates status of application group.
-func (x *Accessor) UpdateAppGroupStatus(appGroupID uuid.UUID, status pb.AppGroupStatus, statusDesc string, workflowId string) error {
+func (x *Accessor) UpdateAppGroupStatus(appGroupID string, status pb.AppGroupStatus, statusDesc string, workflowId string) error {
 	res := x.db.Model(&model.ApplicationGroup{}).
 		Where("id = ?", appGroupID).
 		Updates(map[string]interface{}{"Status": status, "StatusDesc": statusDesc, "WorkflowId": workflowId})
@@ -118,8 +117,8 @@ func (x *Accessor) UpdateAppGroupStatus(appGroupID uuid.UUID, status pb.AppGroup
 }
 
 // DeleteAppGroup deletes an application group and applications.
-func (x *Accessor) DeleteAppGroup(appGroupID uuid.UUID) error {
-	res := x.db.Delete(&model.ApplicationGroup{}, appGroupID)
+func (x *Accessor) DeleteAppGroup(appGroupID string) error {
+	res := x.db.Delete(&model.ApplicationGroup{}, "id = ?", appGroupID)
 	log.Info("application group id ", appGroupID, " is deleted!")
 	if res.Error != nil || res.RowsAffected == 0 {
 		return fmt.Errorf("could not delete application group for app group id %s", appGroupID)
@@ -133,7 +132,7 @@ func (x *Accessor) DeleteAppGroup(appGroupID uuid.UUID) error {
 }
 
 // GetAppsByAppGroupID queies applications by app group id.
-func (x *Accessor) GetAppsByAppGroupID(appGroupID uuid.UUID) ([]*pb.Application, error) {
+func (x *Accessor) GetAppsByAppGroupID(appGroupID string) ([]*pb.Application, error) {
 	var appModels []model.Application
 	res := x.db.Where("app_group_id = ?", appGroupID).Find(&appModels)
 	if res.Error != nil || res.RowsAffected == 0 {
@@ -143,7 +142,7 @@ func (x *Accessor) GetAppsByAppGroupID(appGroupID uuid.UUID) ([]*pb.Application,
 }
 
 // GetApps queies applications by app type.
-func (x *Accessor) GetApps(appGroupID uuid.UUID, appType pb.AppType) ([]*pb.Application, error) {
+func (x *Accessor) GetApps(appGroupID string, appType pb.AppType) ([]*pb.Application, error) {
 	var appModels []model.Application
 	res := x.db.Where("app_group_id = ? AND type = ?", appGroupID, appType).Find(&appModels)
 	if res.Error != nil && !errors.Is(res.Error, gorm.ErrRecordNotFound) {
@@ -153,7 +152,7 @@ func (x *Accessor) GetApps(appGroupID uuid.UUID, appType pb.AppType) ([]*pb.Appl
 }
 
 // UpdateApp updates data of application in database.
-func (x *Accessor) UpdateApp(appGroupID uuid.UUID, appType pb.AppType, endpoint, metadata string) error {
+func (x *Accessor) UpdateApp(appGroupID string, appType pb.AppType, endpoint, metadata string) error {
 	res := x.db.Model(&model.Application{}).Where("app_group_id = ? AND type = ?", appGroupID, appType).
 		Updates(map[string]interface{}{"endpoint": endpoint, "metadata": metadata})
 	if res.Error != nil {
@@ -166,7 +165,7 @@ func (x *Accessor) UpdateApp(appGroupID uuid.UUID, appType pb.AppType, endpoint,
 	return nil
 }
 
-func (x *Accessor) createApplication(appGroupID uuid.UUID, appType pb.AppType, endpoint, metadata string) error {
+func (x *Accessor) createApplication(appGroupID string, appType pb.AppType, endpoint, metadata string) error {
 	app := model.Application{
 		AppGroupId: appGroupID,
 		Type:       appType,
@@ -190,13 +189,13 @@ func reflectToPbAppGroups(models []model.ApplicationGroup) []*pb.AppGroup {
 
 func reflectToPbAppGroup(model model.ApplicationGroup) *pb.AppGroup {
 	return &pb.AppGroup{
-		AppGroupId:    model.ID.String(),
+		AppGroupId:    model.ID,
 		AppGroupName:  model.Name,
 		Type:          model.Type,
 		WorkflowId:    model.WorkflowId,
 		Status:        model.Status,
 		StatusDesc:    model.StatusDesc,
-		ClusterId:     model.ClusterId.String(),
+		ClusterId:     model.ClusterId,
 		ExternalLabel: model.ExternalLabel,
 		CreatedAt:     timestamppb.New(model.CreatedAt),
 		UpdatedAt:     timestamppb.New(model.UpdatedAt),
@@ -214,7 +213,7 @@ func reflectToPbApplications(models []model.Application) []*pb.Application {
 func reflectToPbApplication(model model.Application) *pb.Application {
 	return &pb.Application{
 		AppId:      model.ID.String(),
-		AppGroupId: model.AppGroupId.String(),
+		AppGroupId: model.AppGroupId,
 		Type:       model.Type,
 		Endpoint:   model.Endpoint,
 		Metadata:   model.Metadata.String(),
@@ -223,7 +222,7 @@ func reflectToPbApplication(model model.Application) *pb.Application {
 	}
 }
 
-func (x *Accessor) existsExternalLabel(clusterID uuid.UUID, label string) (bool, error) {
+func (x *Accessor) existsExternalLabel(clusterID string, label string) (bool, error) {
 	if label == "" {
 		return false, nil
 	}
