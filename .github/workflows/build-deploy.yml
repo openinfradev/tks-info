@@ -41,8 +41,8 @@ jobs:
         git config --global user.email "tks@github.com"
         git config --global user.name "tks"
 
-        git clone "https://${{secrets.BOT_GITHUB_TOKEN}}@github.com/openinfradev/tks-manifests.git"
-        cd tks-manifests/${SERVICE}/overlay/${TARGET}
+        git clone "https://${{secrets.BOT_GITHUB_TOKEN}}@github.com/openinfradev/cicd-manifests.git"
+        cd cicd-manifests/${SERVICE}/overlay/${TARGET}
 
         kustomize edit set image docker.io/sktcloud/${SERVICE}:${TAG}
         git add kustomization.yaml

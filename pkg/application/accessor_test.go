@@ -7,7 +7,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/google/uuid"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 
@@ -21,7 +20,7 @@ import (
 
 var (
 	clusterID  string
-	appGroupID uuid.UUID
+	appGroupID string
 	appName    string
 	accessor   *application.Accessor
 )
