@@ -2,7 +2,7 @@
 CREATE TABLE keycloak_infos
 (
     id uuid primary key,
-    cluster_id uuid,
+    cluster_id character varying(10) COLLATE pg_catalog."default",
     realm character varying(100) COLLATE pg_catalog."default",
     client_id character varying(100) COLLATE pg_catalog."default",
     secret character varying(1000) COLLATE pg_catalog."default",

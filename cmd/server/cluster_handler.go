@@ -9,6 +9,7 @@ import (
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 
+	"github.com/openinfradev/tks-common/pkg/helper"
 	"github.com/openinfradev/tks-common/pkg/log"
 	"github.com/openinfradev/tks-info/pkg/cluster"
 	pb "github.com/openinfradev/tks-proto/tks_pb"
@@ -41,15 +42,15 @@ func (s *ClusterInfoServer) AddClusterInfo(ctx context.Context, in *pb.AddCluste
 		return &res, err
 	}
 
-	contractId, err := uuid.Parse(in.GetContractId())
-	if err != nil {
+	contractId := in.GetContractId()
+	if !helper.ValidateContractId(contractId) {
 		res := pb.IDResponse{
 			Code: pb.Code_INVALID_ARGUMENT,
 			Error: &pb.Error{
-				Msg: fmt.Sprintf("Invalid contract ID %s", in.GetContractId()),
+				Msg: fmt.Sprintf("Invalid contract ID %s", contractId),
 			},
 		}
-		return &res, err
+		return &res, fmt.Errorf("invalid contract ID %s", contractId)
 	}
 
 	// Return an error if csp id does not exist.
@@ -78,21 +79,21 @@ func (s *ClusterInfoServer) AddClusterInfo(ctx context.Context, in *pb.AddCluste
 	return &pb.IDResponse{
 		Code:  pb.Code_OK_UNSPECIFIED,
 		Error: nil,
-		Id:    cID.String(),
+		Id:    cID,
 	}, nil
 }
 
 // GetCluster get cluster for the id of the cluster
 func (s *ClusterInfoServer) GetCluster(ctx context.Context, in *pb.GetClusterRequest) (*pb.GetClusterResponse, error) {
-	clusterId, err := uuid.Parse(in.GetClusterId())
-	if err != nil {
+	clusterId := in.GetClusterId()
+	if !helper.ValidateClusterId(clusterId) {
 		res := pb.GetClusterResponse{
 			Code: pb.Code_INVALID_ARGUMENT,
 			Error: &pb.Error{
-				Msg: fmt.Sprintf("Invalid cluster ID %s", in.GetClusterId()),
+				Msg: fmt.Sprintf("Invalid cluster ID %s", clusterId),
 			},
 		}
-		return &res, err
+		return &res, fmt.Errorf("invalid cluster ID %s", clusterId)
 	}
 
 	cluster, err := clusterAccessor.GetCluster(clusterId)
@@ -148,15 +149,15 @@ func (s *ClusterInfoServer) GetClusters(ctx context.Context, in *pb.GetClustersR
 		/*****************************
 		 * Get clusters by contractID *
 		 *****************************/
-		conIdParsed, err := uuid.Parse(contractId)
-		if err != nil {
+		conIdParsed := contractId
+		if !helper.ValidateContractId(conIdParsed) {
 			return &pb.GetClustersResponse{
 				Code: pb.Code_INVALID_ARGUMENT,
 				Error: &pb.Error{
-					Msg: fmt.Sprintf("Invalid Contract ID %s", contractId),
+					Msg: fmt.Sprintf("Invalid Contract ID %s", conIdParsed),
 				},
 				Clusters: nil,
-			}, err
+			}, fmt.Errorf("invalid contract ID %s", conIdParsed)
 		}
 
 		clusters, err := clusterAccessor.GetClustersByContractID(conIdParsed)
@@ -213,18 +214,17 @@ func (s *ClusterInfoServer) GetClusters(ctx context.Context, in *pb.GetClustersR
 
 // UpdateClusterStatus update Status of the Cluster
 func (s *ClusterInfoServer) UpdateClusterStatus(ctx context.Context, in *pb.UpdateClusterStatusRequest) (*pb.SimpleResponse, error) {
-	clusterId, err := uuid.Parse(in.GetClusterId())
-	if err != nil {
-		res := pb.SimpleResponse{
+	clusterId := in.GetClusterId()
+	if !helper.ValidateClusterId(clusterId) {
+		return &pb.SimpleResponse{
 			Code: pb.Code_INVALID_ARGUMENT,
 			Error: &pb.Error{
-				Msg: fmt.Sprintf("Invalid Cluster ID %s", in.GetClusterId()),
+				Msg: fmt.Sprintf("Invalid Cluster ID %s", clusterId),
 			},
-		}
-		return &res, err
+		}, fmt.Errorf("invalid cluster ID %s", clusterId)
 	}
 
-	err = clusterAccessor.UpdateStatus(clusterId, in.GetStatus(), in.GetStatusDesc(), in.GetWorkflowId())
+	err := clusterAccessor.UpdateStatus(clusterId, in.GetStatus(), in.GetStatusDesc(), in.GetWorkflowId())
 	if err != nil {
 		return &pb.SimpleResponse{
 			Code: pb.Code_INTERNAL,

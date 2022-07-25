@@ -7,6 +7,7 @@ import (
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 
+	"github.com/openinfradev/tks-common/pkg/helper"
 	"github.com/openinfradev/tks-common/pkg/log"
 	"github.com/openinfradev/tks-info/pkg/csp_info"
 	pb "github.com/openinfradev/tks-proto/tks_pb"
@@ -28,15 +29,14 @@ func InitCspInfoHandler(db *gorm.DB) {
 func (s *CspInfoServer) CreateCSPInfo(ctx context.Context, in *pb.CreateCSPInfoRequest) (*pb.IDResponse, error) {
 	log.Info("Request CreateCSPInfo for contractID ", in.GetContractId())
 
-	contractId, err := uuid.Parse(in.GetContractId())
-	if err != nil {
-		res := pb.IDResponse{
+	contractId := in.GetContractId()
+	if !helper.ValidateContractId(contractId) {
+		return &pb.IDResponse{
 			Code: pb.Code_INVALID_ARGUMENT,
 			Error: &pb.Error{
-				Msg: fmt.Sprintf("invalid contract ID %s", in.GetContractId()),
+				Msg: fmt.Sprintf("invalid contract ID %s", contractId),
 			},
-		}
-		return &res, err
+		}, fmt.Errorf("invalid contract ID %s", contractId)
 	}
 
 	id, err := cspInfoAccessor.Create(contractId, in.GetCspName(), in.GetAuth(), in.GetCspType())
@@ -83,7 +83,7 @@ func (s *CspInfoServer) GetCSPInfo(ctx context.Context, in *pb.IDRequest) (*pb.G
 	return &pb.GetCSPInfoResponse{
 		Code:       pb.Code_OK_UNSPECIFIED,
 		Error:      nil,
-		ContractId: cspInfo.ContractID.String(),
+		ContractId: cspInfo.ContractID,
 		CspName:    cspInfo.Name,
 		Auth:       cspInfo.Auth,
 		CspType:    cspInfo.CspType,
@@ -94,16 +94,15 @@ func (s *CspInfoServer) GetCSPInfo(ctx context.Context, in *pb.IDRequest) (*pb.G
 func (s *CspInfoServer) GetCSPIDsByContractID(ctx context.Context, in *pb.IDRequest) (*pb.IDsResponse, error) {
 	log.Info("request GetCSPIDsByContractID for contract ID ", in.GetId())
 
-	contractId, err := uuid.Parse(in.GetId())
-	if err != nil {
-		res := pb.IDsResponse{
+	contractId := in.GetId()
+	if !helper.ValidateContractId(contractId) {
+		return &pb.IDsResponse{
 			Code: pb.Code_INVALID_ARGUMENT,
 			Error: &pb.Error{
-				Msg: fmt.Sprintf("invalid contract ID %s", in.GetId()),
+				Msg: fmt.Sprintf("invalid contract ID %s", contractId),
 			},
 			Ids: nil,
-		}
-		return &res, err
+		}, fmt.Errorf("invalid contract ID %s", contractId)
 	}
 
 	ids, err := cspInfoAccessor.GetCSPIDsByContractID(contractId)

@@ -18,7 +18,7 @@ import (
 
 var (
 	cspId           uuid.UUID
-	contractId      uuid.UUID
+	contractId      string
 	cspInfoAccessor *csp_info.CspInfoAccessor
 )
 
@@ -29,7 +29,7 @@ var (
 )
 
 func init() {
-	contractId = uuid.New()
+	contractId = helper.GenerateContractId()
 
 	log.Disable()
 }

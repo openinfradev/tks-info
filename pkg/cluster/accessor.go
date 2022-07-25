@@ -26,9 +26,9 @@ func New(db *gorm.DB) *ClusterAccessor {
 }
 
 // Get returns a Cluster if it exists.
-func (x *ClusterAccessor) GetCluster(id uuid.UUID) (*pb.Cluster, error) {
+func (x *ClusterAccessor) GetCluster(id string) (*pb.Cluster, error) {
 	var cluster model.Cluster
-	res := x.db.First(&cluster, id)
+	res := x.db.First(&cluster, "id = ?", id)
 	if res.RowsAffected == 0 || res.Error != nil {
 		return &pb.Cluster{}, fmt.Errorf("Could not find Cluster with ID: %s", id)
 	}
@@ -38,7 +38,7 @@ func (x *ClusterAccessor) GetCluster(id uuid.UUID) (*pb.Cluster, error) {
 }
 
 // GetClusterIDsByContractID returns a list of clusters by ContractID if it exists.
-func (x *ClusterAccessor) GetClustersByContractID(contractId uuid.UUID) ([]*pb.Cluster, error) {
+func (x *ClusterAccessor) GetClustersByContractID(contractId string) ([]*pb.Cluster, error) {
 	var clusters []model.Cluster
 
 	res := x.db.Find(&clusters, "contract_id = ?", contractId)
@@ -79,7 +79,7 @@ func (x *ClusterAccessor) GetClustersByCspID(cspId uuid.UUID) ([]*pb.Cluster, er
 }
 
 // Create creates new cluster with contract ID, csp ID, name.
-func (x *ClusterAccessor) CreateClusterInfo(contractId uuid.UUID, cspId uuid.UUID, name string, conf *pb.ClusterConf) (uuid.UUID, error) {
+func (x *ClusterAccessor) CreateClusterInfo(contractId string, cspId uuid.UUID, name string, conf *pb.ClusterConf) (string, error) {
 	cluster := model.Cluster{
 		ContractID:   contractId,
 		CspID:        cspId,
@@ -97,7 +97,7 @@ func (x *ClusterAccessor) CreateClusterInfo(contractId uuid.UUID, cspId uuid.UUI
 
 	res := x.db.Create(&cluster)
 	if res.Error != nil {
-		nilId, _ := uuid.Parse("")
+		nilId := ""
 		return nilId, res.Error
 	}
 
@@ -105,13 +105,13 @@ func (x *ClusterAccessor) CreateClusterInfo(contractId uuid.UUID, cspId uuid.UUI
 }
 
 // UpdateStatus updates an status of cluster for Cluster.
-func (x *ClusterAccessor) UpdateStatus(id uuid.UUID, status pb.ClusterStatus, statusDesc string, workflowId string) error {
+func (x *ClusterAccessor) UpdateStatus(id string, status pb.ClusterStatus, statusDesc string, workflowId string) error {
 	res := x.db.Model(&model.Cluster{}).
 		Where("ID = ?", id).
 		Updates(map[string]interface{}{"Status": status, "StatusDesc": statusDesc, "WorkflowId": workflowId})
 
 	if res.Error != nil || res.RowsAffected == 0 {
-		return fmt.Errorf("nothing updated in cluster with id %s", id.String())
+		return fmt.Errorf("nothing updated in cluster with id %s", id)
 	}
 
 	return nil
@@ -128,14 +128,14 @@ func ConvertToPbCluster(cluster model.Cluster) *pb.Cluster {
 	}
 
 	return &pb.Cluster{
-		Id:         cluster.ID.String(),
+		Id:         cluster.ID,
 		Name:       cluster.Name,
 		CreatedAt:  timestamppb.New(cluster.CreatedAt),
 		UpdatedAt:  timestamppb.New(cluster.UpdatedAt),
 		WorkflowId: cluster.WorkflowId,
 		Status:     cluster.Status,
 		StatusDesc: cluster.StatusDesc,
-		ContractId: cluster.ContractID.String(),
+		ContractId: cluster.ContractID,
 		CspId:      cluster.CspID.String(),
 		Kubeconfig: cluster.Kubeconfig,
 		Conf:       &tempConf,

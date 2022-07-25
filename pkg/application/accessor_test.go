@@ -7,7 +7,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/google/uuid"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 
@@ -20,8 +19,8 @@ import (
 )
 
 var (
-	clusterID  uuid.UUID
-	appGroupID uuid.UUID
+	clusterID  string
+	appGroupID string
 	appName    string
 	accessor   *application.Accessor
 )
@@ -32,7 +31,7 @@ var (
 )
 
 func init() {
-	clusterID = uuid.New()
+	clusterID = helper.GenerateClusterId()
 
 	log.Disable()
 }

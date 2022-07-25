@@ -2,6 +2,7 @@ package keycloak_info
 
 import (
 	"fmt"
+
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 
@@ -19,7 +20,7 @@ func New(db *gorm.DB) *KeycloakInfoAccessor {
 	}
 }
 
-func (x *KeycloakInfoAccessor) Create(clusterId uuid.UUID, realm string, clientId string, secret string, privateKey string) (uuid.UUID, error) {
+func (x *KeycloakInfoAccessor) Create(clusterId string, realm string, clientId string, secret string, privateKey string) (uuid.UUID, error) {
 	keycloackInfo := model.KeycloakInfo{ClusterId: clusterId, Realm: realm, ClientId: clientId, Secret: secret, PrivateKey: privateKey}
 
 	res := x.db.Create(&keycloackInfo)
@@ -31,7 +32,7 @@ func (x *KeycloakInfoAccessor) Create(clusterId uuid.UUID, realm string, clientI
 	return keycloackInfo.Id, nil
 }
 
-func (x *KeycloakInfoAccessor) GetKeycloakInfos(clusterId uuid.UUID) ([]*pb.KeycloakInfo, error) {
+func (x *KeycloakInfoAccessor) GetKeycloakInfos(clusterId string) ([]*pb.KeycloakInfo, error) {
 	var keycloakInfos []model.KeycloakInfo
 
 	res := x.db.Find(&keycloakInfos, "cluster_id = ?", clusterId)
@@ -49,7 +50,7 @@ func (x *KeycloakInfoAccessor) GetKeycloakInfos(clusterId uuid.UUID) ([]*pb.Keyc
 
 func ConvertToPbKeycloakInfo(keycloakInfo model.KeycloakInfo) *pb.KeycloakInfo {
 	return &pb.KeycloakInfo{
-		ClusterId:  keycloakInfo.ClusterId.String(),
+		ClusterId:  keycloakInfo.ClusterId,
 		Realm:      keycloakInfo.Realm,
 		ClientId:   keycloakInfo.ClientId,
 		Secret:     keycloakInfo.Secret,

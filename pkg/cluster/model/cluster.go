@@ -4,15 +4,16 @@ import (
 	"time"
 
 	uuid "github.com/google/uuid"
+	"github.com/openinfradev/tks-common/pkg/helper"
 	pb "github.com/openinfradev/tks-proto/tks_pb"
 	"gorm.io/gorm"
 )
 
 // Cluster represents a kubernetes cluster information.
 type Cluster struct {
-	ID           uuid.UUID `gorm:"primarykey;type:uuid;default:uuid_generate_v4()"`
+	ID           string `gorm:"primarykey"`
 	Name         string
-	ContractID   uuid.UUID
+	ContractID   string
 	CspID        uuid.UUID
 	WorkflowId   string
 	Status       pb.ClusterStatus
@@ -29,6 +30,6 @@ type Cluster struct {
 }
 
 func (c *Cluster) BeforeCreate(tx *gorm.DB) (err error) {
-	c.ID = uuid.New()
+	c.ID = helper.GenerateClusterId()
 	return nil
 }

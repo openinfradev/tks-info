@@ -2,6 +2,7 @@ package csp_info
 
 import (
 	"fmt"
+
 	uuid "github.com/google/uuid"
 	"gorm.io/gorm"
 
@@ -33,7 +34,7 @@ func (x *CspInfoAccessor) GetCSPInfo(id uuid.UUID) (model.CSPInfo, error) {
 }
 
 // GetCSPIDsByContractID returns a list of CSP ID by contract ID if it exists.
-func (x *CspInfoAccessor) GetCSPIDsByContractID(contractId uuid.UUID) ([]string, error) {
+func (x *CspInfoAccessor) GetCSPIDsByContractID(contractId string) ([]string, error) {
 	var cspInfos []model.CSPInfo
 
 	res := x.db.Select("id").Find(&cspInfos, "contract_id = ?", contractId)
@@ -50,7 +51,7 @@ func (x *CspInfoAccessor) GetCSPIDsByContractID(contractId uuid.UUID) ([]string,
 }
 
 // Create creates new CSP info with contractID and auth.
-func (x *CspInfoAccessor) Create(contractId uuid.UUID, name string, auth string, cspType pb.CspType) (uuid.UUID, error) {
+func (x *CspInfoAccessor) Create(contractId string, name string, auth string, cspType pb.CspType) (uuid.UUID, error) {
 	cspInfo := model.CSPInfo{ContractID: contractId, Name: name, Auth: auth, CspType: cspType}
 
 	res := x.db.Create(&cspInfo)
