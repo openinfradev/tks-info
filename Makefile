@@ -14,10 +14,10 @@ fmt:
 build: build-darwin build-linux
 
 build-darwin:
-	CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build -o bin/tks-darwin-amd64 ./cmd/server/
+	CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build -o bin/tks-info-darwin-amd64 ./cmd/server/
 
 build-linux:
-	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o bin/tks-linux-amd64 ./cmd/server/
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o bin/tks-info-linux-amd64 ./cmd/server/
 
 test:
 	go test -v ./... -cover

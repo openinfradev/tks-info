@@ -73,6 +73,7 @@ func main() {
 
 	// initialize handlers
 	InitAppInfoHandler(db)
+	InitAppServeAppHandler(db)
 	InitClusterInfoHandler(db)
 	InitCspInfoHandler(db)
 	InitKeycloakInfoHandler(db)
@@ -89,6 +90,7 @@ func main() {
 	}
 
 	pb.RegisterAppInfoServiceServer(s, &AppInfoServer{})
+	pb.RegisterAppServeAppServiceServer(s, &AppServeAppServer{})
 	pb.RegisterClusterInfoServiceServer(s, &ClusterInfoServer{})
 	pb.RegisterCspInfoServiceServer(s, &CspInfoServer{})
 	pb.RegisterKeycloakInfoServiceServer(s, &KeycloakInfoServer{})
