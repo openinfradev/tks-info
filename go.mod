@@ -9,7 +9,7 @@ require (
 	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0 // indirect
 	github.com/jackc/pgx/v4 v4.15.0 // indirect
 	github.com/openinfradev/tks-common v0.0.0-20220719011208-3173307dcfa4
-	github.com/openinfradev/tks-proto v0.0.6-0.20220406043255-9fffe49c4625
+	github.com/openinfradev/tks-proto v0.0.6-0.20220831015809-fad377174017
 	github.com/stretchr/testify v1.7.0
 	golang.org/x/crypto v0.0.0-20220210151621-f4118a5b28e2 // indirect
 	google.golang.org/genproto v0.0.0-20220211171837-173942840c17 // indirect
@@ -25,6 +25,6 @@ require (
 
 replace github.com/openinfradev/tks-info => ./
 
-replace github.com/openinfradev/tks-proto => ../tks-proto
+//replace github.com/openinfradev/tks-proto => ../tks-proto
 //replace github.com/openinfradev/tks-common => ../tks-common
 //replace github.com/openinfradev/tks-contract => ../tks-contract
