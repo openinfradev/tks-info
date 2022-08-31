@@ -97,7 +97,6 @@ func (s *AppServeAppServer) UpdateAppServeAppEndpoint(ctx context.Context, in *p
 }
 
 func (s *AppServeAppServer) GetAppServeApps(ctx context.Context, in *pb.GetAppServeAppsRequest) (*pb.GetAppServeAppsResponse, error) {
-	//contractId, err := uuid.Parse(in.GetContractId())
 	contractId := in.GetContractId()
 	log.Info("GetAppServeApps request for contractID: ", contractId)
 
@@ -118,14 +117,13 @@ func (s *AppServeAppServer) GetAppServeApps(ctx context.Context, in *pb.GetAppSe
 	}, nil
 }
 
-// TODO
 func (s *AppServeAppServer) GetAppServeApp(ctx context.Context, in *pb.GetAppServeAppRequest) (*pb.GetAppServeAppResponse, error) {
 	id, err := uuid.Parse(in.GetAppServeAppId())
 	if err != nil {
 		return &pb.GetAppServeAppResponse{
 			Code: pb.Code_INVALID_ARGUMENT,
 			Error: &pb.Error{
-				Msg: fmt.Sprintf("Invalid appServe application ID: %s", in.GetAppServeAppId()),
+				Msg: fmt.Sprintf("Invalid appServeApp ID: %s", in.GetAppServeAppId()),
 			},
 		}, err
 	}

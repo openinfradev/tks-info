@@ -1,15 +1,12 @@
 package app_serve_app
 
 import (
-	//"errors"
 	"fmt"
 
 	"github.com/google/uuid"
-	//"github.com/openinfradev/tks-common/pkg/log"
 	"github.com/openinfradev/tks-info/pkg/app_serve_app/model"
 	pb "github.com/openinfradev/tks-proto/tks_pb"
 	"google.golang.org/protobuf/types/known/timestamppb"
-	//"gorm.io/datatypes"
 	"gorm.io/gorm"
 )
 
@@ -25,7 +22,7 @@ func New(db *gorm.DB) *AsaAccessor {
 	}
 }
 
-// Create creates a new application group in database.
+// Create creates a new appServeApp in database.
 func (x *AsaAccessor) Create(contractId string, app *pb.AppServeApp) (uuid.UUID, error) {
 	asaModel := model.AppServeApp{
 		Name:          app.GetName(),
