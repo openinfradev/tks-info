@@ -35,7 +35,7 @@ func (x *AsaAccessor) Create(contractId string, app *pb.AppServeApp) (uuid.UUID,
 		Status:        app.GetStatus(),
 		ArtifactUrl:   app.GetArtifactUrl(),
 		ImageUrl:      app.GetImageUrl(),
-		TargetCluster: app.GetTargetCluster(),
+		TargetClusterId: app.GetTargetClusterId(),
 		Profile:       app.GetProfile(),
 	}
 	res := x.db.Create(&asaModel)
@@ -108,7 +108,7 @@ func ConvertToPbAppServeApp(asa model.AppServeApp) *pb.AppServeApp {
 		ImageUrl:      asa.ImageUrl,
 		ArtifactUrl:   asa.ArtifactUrl,
 		EndpointUrl:   asa.EndpointUrl,
-		TargetCluster: asa.TargetCluster,
+		TargetClusterId: asa.TargetClusterId,
 		Profile:       asa.Profile,
 		CreatedAt:     timestamppb.New(asa.CreatedAt),
 		UpdatedAt:     timestamppb.New(asa.UpdatedAt),

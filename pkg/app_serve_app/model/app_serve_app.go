@@ -4,8 +4,6 @@ import (
 	"time"
 
 	uuid "github.com/google/uuid"
-	//pb "github.com/openinfradev/tks-proto/tks_pb"
-	//"gorm.io/datatypes"
 	"gorm.io/gorm"
 )
 
@@ -24,7 +22,7 @@ type AppServeApp struct {
 	ArtifactUrl   string
 	ImageUrl      string
 	EndpointUrl   string
-	TargetCluster string
+	TargetClusterId string
 	Profile       string
 	CreatedAt     time.Time
 	UpdatedAt     time.Time
