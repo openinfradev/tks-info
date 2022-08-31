@@ -25,15 +25,15 @@ func New(db *gorm.DB) *AsaAccessor {
 // Create creates a new appServeApp in database.
 func (x *AsaAccessor) Create(contractId string, app *pb.AppServeApp) (uuid.UUID, error) {
 	asaModel := model.AppServeApp{
-		Name:          app.GetName(),
-		ContractId:    contractId,
-		Version:       app.GetVersion(),
-		TaskType:      app.GetTaskType(),
-		Status:        app.GetStatus(),
-		ArtifactUrl:   app.GetArtifactUrl(),
-		ImageUrl:      app.GetImageUrl(),
+		Name:            app.GetName(),
+		ContractId:      contractId,
+		Version:         app.GetVersion(),
+		TaskType:        app.GetTaskType(),
+		Status:          app.GetStatus(),
+		ArtifactUrl:     app.GetArtifactUrl(),
+		ImageUrl:        app.GetImageUrl(),
 		TargetClusterId: app.GetTargetClusterId(),
-		Profile:       app.GetProfile(),
+		Profile:         app.GetProfile(),
 	}
 	res := x.db.Create(&asaModel)
 	if res.Error != nil {
@@ -95,19 +95,19 @@ func (x *AsaAccessor) UpdateEndpoint(id uuid.UUID, endpoint string) error {
 
 func ConvertToPbAppServeApp(asa model.AppServeApp) *pb.AppServeApp {
 	return &pb.AppServeApp{
-		Id:            asa.ID.String(),
-		Name:          asa.Name,
-		ContractId:    asa.ContractId,
-		Version:       asa.Version,
-		TaskType:      asa.TaskType,
-		Status:        asa.Status,
-		Output:        asa.Output,
-		ImageUrl:      asa.ImageUrl,
-		ArtifactUrl:   asa.ArtifactUrl,
-		EndpointUrl:   asa.EndpointUrl,
+		Id:              asa.ID.String(),
+		Name:            asa.Name,
+		ContractId:      asa.ContractId,
+		Version:         asa.Version,
+		TaskType:        asa.TaskType,
+		Status:          asa.Status,
+		Output:          asa.Output,
+		ImageUrl:        asa.ImageUrl,
+		ArtifactUrl:     asa.ArtifactUrl,
+		EndpointUrl:     asa.EndpointUrl,
 		TargetClusterId: asa.TargetClusterId,
-		Profile:       asa.Profile,
-		CreatedAt:     timestamppb.New(asa.CreatedAt),
-		UpdatedAt:     timestamppb.New(asa.UpdatedAt),
+		Profile:         asa.Profile,
+		CreatedAt:       timestamppb.New(asa.CreatedAt),
+		UpdatedAt:       timestamppb.New(asa.UpdatedAt),
 	}
 }
