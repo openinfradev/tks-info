@@ -21,14 +21,15 @@ func InitAppServeAppHandler(db *gorm.DB) {
 	asaAccessor = asa.New(db)
 }
 
-func (s *AppServeAppServer) CreateAppServeApp(ctx context.Context, in *pb.CreateAppServeAppRequest) (*pb.IDResponse, error) {
-	appServeApp := in.GetApp()
+func (s *AppServeAppServer) CreateAppServeApp(ctx context.Context, in *pb.CreateAppServeAppRequest) (*pb.CreateAppServeAppResponse, error) {
+	appServeApp := in.GetAppServeApp()
+	appServeAppTask := in.GetAppServeAppTask()
 	contractID := appServeApp.GetContractId()
 	log.Info("Handling request 'CreateAppServeApp' for contract id ", contractID)
 
-	id, err := asaAccessor.Create(contractID, appServeApp)
+	id, taskId, err := asaAccessor.Create(contractID, appServeApp, appServeAppTask)
 	if err != nil {
-		return &pb.IDResponse{
+		return &pb.CreateAppServeAppResponse{
 			Code: pb.Code_INTERNAL,
 			Error: &pb.Error{
 				Msg: err.Error(),
@@ -36,18 +37,19 @@ func (s *AppServeAppServer) CreateAppServeApp(ctx context.Context, in *pb.Create
 		}, err
 	}
 
-	res := &pb.IDResponse{
-		Code:  pb.Code_OK_UNSPECIFIED,
-		Error: nil,
-		Id:    id.String(),
+	res := &pb.CreateAppServeAppResponse{
+		Code:   pb.Code_OK_UNSPECIFIED,
+		Error:  nil,
+		Id:     id.String(),
+		TaskId: taskId.String(),
 	}
 	return res, nil
 }
 
-func (s *AppServeAppServer) UpdateAppServeAppStatus(ctx context.Context, in *pb.UpdateAppServeAppStatusRequest) (*pb.SimpleResponse, error) {
+func (s *AppServeAppServer) UpdateAppServeApp(ctx context.Context, in *pb.UpdateAppServeAppRequest) (*pb.UpdateAppServeAppResponse, error) {
 	appServeAppId, err := uuid.Parse(in.GetAppServeAppId())
 	if err != nil {
-		return &pb.SimpleResponse{
+		return &pb.UpdateAppServeAppResponse{
 			Code: pb.Code_INVALID_ARGUMENT,
 			Error: &pb.Error{
 				Msg: fmt.Sprintf("invalid appServeApp ID %s", in.GetAppServeAppId()),
@@ -55,7 +57,38 @@ func (s *AppServeAppServer) UpdateAppServeAppStatus(ctx context.Context, in *pb.
 		}, err
 	}
 
-	err = asaAccessor.UpdateStatus(appServeAppId, in.GetStatus(), in.GetOutput())
+	log.Info("Handling request 'UpdateAppServeApp' for AppServeApp ID ", appServeAppId)
+
+	taskId, err := asaAccessor.Update(appServeAppId, in.GetAppServeAppTask())
+	if err != nil {
+		return &pb.UpdateAppServeAppResponse{
+			Code: pb.Code_INTERNAL,
+			Error: &pb.Error{
+				Msg: err.Error(),
+			},
+		}, err
+	}
+
+	res := &pb.UpdateAppServeAppResponse{
+		Code:   pb.Code_OK_UNSPECIFIED,
+		Error:  nil,
+		TaskId: taskId.String(),
+	}
+	return res, nil
+}
+
+func (s *AppServeAppServer) UpdateAppServeAppStatus(ctx context.Context, in *pb.UpdateAppServeAppStatusRequest) (*pb.SimpleResponse, error) {
+	appServeAppTaskId, err := uuid.Parse(in.GetAppServeAppTaskId())
+	if err != nil {
+		return &pb.SimpleResponse{
+			Code: pb.Code_INVALID_ARGUMENT,
+			Error: &pb.Error{
+				Msg: fmt.Sprintf("invalid appServeAppTask ID %s", in.GetAppServeAppTaskId()),
+			},
+		}, err
+	}
+
+	err = asaAccessor.UpdateStatus(appServeAppTaskId, in.GetStatus(), in.GetOutput())
 	if err != nil {
 		return &pb.SimpleResponse{
 			Code: pb.Code_INTERNAL,
@@ -81,7 +114,17 @@ func (s *AppServeAppServer) UpdateAppServeAppEndpoint(ctx context.Context, in *p
 		}, err
 	}
 
-	err = asaAccessor.UpdateEndpoint(appServeAppId, in.GetEndpoint())
+	appServeAppTaskId, err := uuid.Parse(in.GetAppServeAppTaskId())
+	if err != nil {
+		return &pb.SimpleResponse{
+			Code: pb.Code_INVALID_ARGUMENT,
+			Error: &pb.Error{
+				Msg: fmt.Sprintf("invalid appServeAppTask ID %s", in.GetAppServeAppTaskId()),
+			},
+		}, err
+	}
+
+	err = asaAccessor.UpdateEndpoint(appServeAppId, appServeAppTaskId, in.GetEndpoint(), in.GetHelmRevision())
 	if err != nil {
 		return &pb.SimpleResponse{
 			Code: pb.Code_INTERNAL,
@@ -111,9 +154,9 @@ func (s *AppServeAppServer) GetAppServeApps(ctx context.Context, in *pb.GetAppSe
 	}
 
 	return &pb.GetAppServeAppsResponse{
-		Code:  pb.Code_OK_UNSPECIFIED,
-		Error: nil,
-		Apps:  appServeApps,
+		Code:         pb.Code_OK_UNSPECIFIED,
+		Error:        nil,
+		AppServeApps: appServeApps,
 	}, nil
 }
 
@@ -129,7 +172,7 @@ func (s *AppServeAppServer) GetAppServeApp(ctx context.Context, in *pb.GetAppSer
 	}
 	log.Info("Received GetAppServeApp request for ID: ", id)
 
-	appServeApp, err := asaAccessor.GetAppServeApp(id, in.GetContractId())
+	appServeAppCombined, err := asaAccessor.GetAppServeApp(id)
 	if err != nil {
 		return &pb.GetAppServeAppResponse{
 			Code: pb.Code_INTERNAL,
@@ -142,7 +185,7 @@ func (s *AppServeAppServer) GetAppServeApp(ctx context.Context, in *pb.GetAppSer
 	return &pb.GetAppServeAppResponse{
 		Code:  pb.Code_OK_UNSPECIFIED,
 		Error: nil,
-		App:   appServeApp,
+		AppServeAppCombined: appServeAppCombined,
 	}, nil
 
 }
