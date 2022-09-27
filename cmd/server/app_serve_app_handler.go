@@ -6,6 +6,7 @@ import (
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 
+	"github.com/openinfradev/tks-common/pkg/helper"
 	"github.com/openinfradev/tks-common/pkg/log"
 	asa "github.com/openinfradev/tks-info/pkg/app_serve_app"
 	pb "github.com/openinfradev/tks-proto/tks_pb"
@@ -24,10 +25,21 @@ func InitAppServeAppHandler(db *gorm.DB) {
 func (s *AppServeAppServer) CreateAppServeApp(ctx context.Context, in *pb.CreateAppServeAppRequest) (*pb.CreateAppServeAppResponse, error) {
 	appServeApp := in.GetAppServeApp()
 	appServeAppTask := in.GetAppServeAppTask()
-	contractID := appServeApp.GetContractId()
-	log.Info("Handling request 'CreateAppServeApp' for contract id ", contractID)
 
-	id, taskId, err := asaAccessor.Create(contractID, appServeApp, appServeAppTask)
+	contractId := appServeApp.GetContractId()
+	if !helper.ValidateContractId(contractId) {
+		res := pb.CreateAppServeAppResponse{
+			Code: pb.Code_INVALID_ARGUMENT,
+			Error: &pb.Error{
+				Msg: fmt.Sprintf("Invalid contract ID %s", contractId),
+			},
+		}
+		return &res, fmt.Errorf("Invalid contract ID %s", contractId)
+	}
+
+	log.Info("Handling request 'CreateAppServeApp' for contract id ", contractId)
+
+	id, taskId, err := asaAccessor.Create(contractId, appServeApp, appServeAppTask)
 	if err != nil {
 		return &pb.CreateAppServeAppResponse{
 			Code: pb.Code_INTERNAL,
@@ -141,7 +153,18 @@ func (s *AppServeAppServer) UpdateAppServeAppEndpoint(ctx context.Context, in *p
 
 func (s *AppServeAppServer) GetAppServeApps(ctx context.Context, in *pb.GetAppServeAppsRequest) (*pb.GetAppServeAppsResponse, error) {
 	contractId := in.GetContractId()
-	log.Info("GetAppServeApps request for contractID: ", contractId)
+
+	if !helper.ValidateContractId(contractId) {
+		res := pb.GetAppServeAppsResponse{
+			Code: pb.Code_INVALID_ARGUMENT,
+			Error: &pb.Error{
+				Msg: fmt.Sprintf("Invalid contract ID %s", contractId),
+			},
+		}
+		return &res, fmt.Errorf("Invalid contract ID %s", contractId)
+	}
+
+	log.Info("GetAppServeApps request for contractId: ", contractId)
 
 	appServeApps, err := asaAccessor.GetAppServeApps(contractId)
 	if err != nil {
@@ -183,8 +206,8 @@ func (s *AppServeAppServer) GetAppServeApp(ctx context.Context, in *pb.GetAppSer
 	}
 
 	return &pb.GetAppServeAppResponse{
-		Code:  pb.Code_OK_UNSPECIFIED,
-		Error: nil,
+		Code:                pb.Code_OK_UNSPECIFIED,
+		Error:               nil,
 		AppServeAppCombined: appServeAppCombined,
 	}, nil
 
