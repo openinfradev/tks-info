@@ -23,23 +23,53 @@ func New(db *gorm.DB) *AsaAccessor {
 }
 
 // Create creates a new appServeApp in database.
-func (x *AsaAccessor) Create(contractId string, app *pb.AppServeApp) (uuid.UUID, error) {
+func (x *AsaAccessor) Create(contractId string, app *pb.AppServeApp, task *pb.AppServeAppTask) (uuid.UUID, uuid.UUID, error) {
 	asaModel := model.AppServeApp{
 		Name:            app.GetName(),
 		ContractId:      contractId,
-		Version:         app.GetVersion(),
 		TaskType:        app.GetTaskType(),
-		Status:          app.GetStatus(),
-		ArtifactUrl:     app.GetArtifactUrl(),
-		ImageUrl:        app.GetImageUrl(),
 		TargetClusterId: app.GetTargetClusterId(),
-		Profile:         app.GetProfile(),
 	}
+
 	res := x.db.Create(&asaModel)
+	if res.Error != nil {
+		return uuid.Nil, uuid.Nil, res.Error
+	}
+
+	asaTaskModel := model.AppServeAppTask{
+		Version:       task.GetVersion(),
+		Status:        task.GetStatus(),
+		ArtifactUrl:   task.GetArtifactUrl(),
+		ImageUrl:      task.GetImageUrl(),
+		Profile:       task.GetProfile(),
+		AppServeAppId: asaModel.ID,
+	}
+
+	res = x.db.Create(&asaTaskModel)
+	if res.Error != nil {
+		return uuid.Nil, uuid.Nil, res.Error
+	}
+
+	return asaModel.ID, asaTaskModel.ID, nil
+}
+
+// Update creates new appServeApp Task for existing appServeApp.
+func (x *AsaAccessor) Update(appServeAppId uuid.UUID, task *pb.AppServeAppTask) (uuid.UUID, error) {
+	asaTaskModel := model.AppServeAppTask{
+		Version:       task.GetVersion(),
+		Status:        task.GetStatus(),
+		ArtifactUrl:   task.GetArtifactUrl(),
+		ImageUrl:      task.GetImageUrl(),
+		Profile:       task.GetProfile(),
+		AppServeAppId: appServeAppId,
+	}
+
+	res := x.db.Create(&asaTaskModel)
 	if res.Error != nil {
 		return uuid.Nil, res.Error
 	}
-	return asaModel.ID, nil
+
+	return asaTaskModel.ID, nil
 }
 
 func (x *AsaAccessor) GetAppServeApps(contractId string) ([]*pb.AppServeApp, error) {
@@ -62,32 +92,50 @@ func (x *AsaAccessor) GetAppServeApps(contractId string) ([]*pb.AppServeApp, err
 	return pbAppServeApps, nil
 }
 
-func (x *AsaAccessor) GetAppServeApp(id uuid.UUID, contractId string) (*pb.AppServeApp, error) {
+func (x *AsaAccessor) GetAppServeApp(id uuid.UUID) (*pb.AppServeAppCombined, error) {
 	var appServeApp model.AppServeApp
-	res := x.db.First(&appServeApp, "id = ? AND contract_id = ?", id, contractId)
+	var appServeAppTasks []model.AppServeAppTask
+	pbAppServeAppCombined := &pb.AppServeAppCombined{}
+
+	res := x.db.First(&appServeApp, "id = ?", id)
 	if res.RowsAffected == 0 || res.Error != nil {
-		return &pb.AppServeApp{}, fmt.Errorf("Could not find AppServeApp with ID: %s", id)
+		return nil, fmt.Errorf("Could not find AppServeApp with ID: %s", id)
+	}
+	pbAppServeAppCombined.AppServeApp = ConvertToPbAppServeApp(appServeApp)
+
+	res = x.db.Order("created_at asc").Find(&appServeAppTasks, "app_serve_app_id = ?", id)
+	if res.Error != nil {
+		return nil, fmt.Errorf("Error while finding appServeAppTasks with appServeApp ID %s. Err: %s", id, res.Error)
 	}
 
-	pbAppServeApp := ConvertToPbAppServeApp(appServeApp)
-	return pbAppServeApp, nil
+	for _, task := range appServeAppTasks {
+		pbAppServeAppCombined.Tasks = append(pbAppServeAppCombined.Tasks, ConvertToPbAppServeAppTask(task))
+	}
+
+	return pbAppServeAppCombined, nil
 }
 
-func (x *AsaAccessor) UpdateStatus(id uuid.UUID, status string, output string) error {
-	res := x.db.Model(&model.AppServeApp{}).Where("ID = ?", id).Updates(model.AppServeApp{Status: status, Output: output})
+func (x *AsaAccessor) UpdateStatus(taskId uuid.UUID, status string, output string) error {
+	res := x.db.Model(&model.AppServeAppTask{}).Where("ID = ?", taskId).Updates(model.AppServeAppTask{Status: status, Output: output})
 
 	if res.Error != nil || res.RowsAffected == 0 {
-		return fmt.Errorf("UpdateStatus: nothing updated in AppServeApp with id %s", id)
+		return fmt.Errorf("UpdateStatus: nothing updated in AppServeAppTask with ID %s", taskId)
 	}
 
 	return nil
 }
 
-func (x *AsaAccessor) UpdateEndpoint(id uuid.UUID, endpoint string) error {
+func (x *AsaAccessor) UpdateEndpoint(id uuid.UUID, taskId uuid.UUID, endpoint string, helmRevision int32) error {
+	// Update Endpoint
 	res := x.db.Model(&model.AppServeApp{}).Where("ID = ?", id).Update("EndpointUrl", endpoint)
-
 	if res.Error != nil || res.RowsAffected == 0 {
 		return fmt.Errorf("UpdateEndpoint: nothing updated in AppServeApp with id %s", id)
+	}
+
+	// Update helm revision
+	res = x.db.Model(&model.AppServeAppTask{}).Where("ID = ?", taskId).Update("HelmRevision", helmRevision)
+	if res.Error != nil || res.RowsAffected == 0 {
+		return fmt.Errorf("UpdateEndpoint: nothing updated in AppServeAppTask with id %s", id)
 	}
 
 	return nil
@@ -98,16 +146,25 @@ func ConvertToPbAppServeApp(asa model.AppServeApp) *pb.AppServeApp {
 		Id:              asa.ID.String(),
 		Name:            asa.Name,
 		ContractId:      asa.ContractId,
-		Version:         asa.Version,
 		TaskType:        asa.TaskType,
-		Status:          asa.Status,
-		Output:          asa.Output,
-		ImageUrl:        asa.ImageUrl,
-		ArtifactUrl:     asa.ArtifactUrl,
 		EndpointUrl:     asa.EndpointUrl,
 		TargetClusterId: asa.TargetClusterId,
-		Profile:         asa.Profile,
 		CreatedAt:       timestamppb.New(asa.CreatedAt),
 		UpdatedAt:       timestamppb.New(asa.UpdatedAt),
+	}
+}
+
+func ConvertToPbAppServeAppTask(task model.AppServeAppTask) *pb.AppServeAppTask {
+	return &pb.AppServeAppTask{
+		Id:           task.ID.String(),
+		Version:      task.Version,
+		Status:       task.Status,
+		Output:       task.Output,
+		ImageUrl:     task.ImageUrl,
+		ArtifactUrl:  task.ArtifactUrl,
+		Profile:      task.Profile,
+		HelmRevision: task.HelmRevision,
+		CreatedAt:    timestamppb.New(task.CreatedAt),
+		UpdatedAt:    timestamppb.New(task.UpdatedAt),
 	}
 }
