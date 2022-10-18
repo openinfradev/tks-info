@@ -65,7 +65,20 @@ func (s *ClusterInfoServer) AddClusterInfo(ctx context.Context, in *pb.AddCluste
 	}
 
 	// Create cluster record
-	cID, err := clusterAccessor.CreateClusterInfo(contractId, cspId, in.GetName(), in.GetConf())
+	creator := uuid.Nil
+	if in.GetCreator() != "" {
+		creator, err = uuid.Parse(in.GetCreator())
+		if err != nil {
+			res := pb.IDResponse{
+				Code: pb.Code_INVALID_ARGUMENT,
+				Error: &pb.Error{
+					Msg: fmt.Sprintf("Invalid Creator ID %s", in.GetCreator()),
+				},
+			}
+			return &res, err
+		}
+	}
+	cID, err := clusterAccessor.CreateClusterInfo(contractId, cspId, in.GetName(), in.GetConf(), creator, in.GetDescription())
 	if err != nil {
 		return &pb.IDResponse{
 			Code: pb.Code_INTERNAL,

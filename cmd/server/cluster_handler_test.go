@@ -393,5 +393,7 @@ func randomAddClusterInfoRequest() *pb.AddClusterInfoRequest {
 			MinSizePerAz: 1,
 			MaxSizePerAz: 5,
 		},
+		Creator:     uuid.New().String(),
+		Description: randomString("Description"),
 	}
 }

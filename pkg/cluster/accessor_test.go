@@ -88,7 +88,7 @@ func TestCreateClusterInfo(t *testing.T) {
 		MaxSizePerAz: 5,
 	}
 
-	clusterId, err = clusterAccessor.CreateClusterInfo(contractId, cspId, clusterName, &dummyConf)
+	clusterId, err = clusterAccessor.CreateClusterInfo(contractId, cspId, clusterName, &dummyConf, uuid.Nil, "")
 	if err != nil {
 		t.Errorf("An error occurred while creating new clusterInfo. Err: %s", err)
 	}

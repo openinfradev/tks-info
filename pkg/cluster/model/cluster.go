@@ -3,7 +3,7 @@ package model
 import (
 	"time"
 
-	uuid "github.com/google/uuid"
+	"github.com/google/uuid"
 	"github.com/openinfradev/tks-common/pkg/helper"
 	pb "github.com/openinfradev/tks-proto/tks_pb"
 	"gorm.io/gorm"
@@ -25,6 +25,8 @@ type Cluster struct {
 	MinSizePerAz int32
 	MaxSizePerAz int32
 	Kubeconfig   string
+	Creator      uuid.UUID
+	Description  string
 	UpdatedAt    time.Time
 	CreatedAt    time.Time
 }
