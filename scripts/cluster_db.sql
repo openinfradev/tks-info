@@ -15,6 +15,8 @@ CREATE TABLE clusters
     min_size_per_az integer,
     max_size_per_az integer,
     kubeconfig character varying(1000) COLLATE pg_catalog."default",
+    creator uuid,
+    description character varying(100) COLLATE pg_catalog."default",
     updated_at timestamp with time zone,
     created_at timestamp with time zone
 );

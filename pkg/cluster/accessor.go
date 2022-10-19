@@ -79,7 +79,7 @@ func (x *ClusterAccessor) GetClustersByCspID(cspId uuid.UUID) ([]*pb.Cluster, er
 }
 
 // Create creates new cluster with contract ID, csp ID, name.
-func (x *ClusterAccessor) CreateClusterInfo(contractId string, cspId uuid.UUID, name string, conf *pb.ClusterConf) (string, error) {
+func (x *ClusterAccessor) CreateClusterInfo(contractId string, cspId uuid.UUID, name string, conf *pb.ClusterConf, creator uuid.UUID, description string) (string, error) {
 	cluster := model.Cluster{
 		ContractID:   contractId,
 		CspID:        cspId,
@@ -93,6 +93,8 @@ func (x *ClusterAccessor) CreateClusterInfo(contractId string, cspId uuid.UUID, 
 		MachineType:  conf.MachineType,
 		MinSizePerAz: conf.MinSizePerAz,
 		MaxSizePerAz: conf.MaxSizePerAz,
+		Creator:      creator,
+		Description:  description,
 	}
 
 	res := x.db.Create(&cluster)
@@ -128,16 +130,18 @@ func ConvertToPbCluster(cluster model.Cluster) *pb.Cluster {
 	}
 
 	return &pb.Cluster{
-		Id:         cluster.ID,
-		Name:       cluster.Name,
-		CreatedAt:  timestamppb.New(cluster.CreatedAt),
-		UpdatedAt:  timestamppb.New(cluster.UpdatedAt),
-		WorkflowId: cluster.WorkflowId,
-		Status:     cluster.Status,
-		StatusDesc: cluster.StatusDesc,
-		ContractId: cluster.ContractID,
-		CspId:      cluster.CspID.String(),
-		Kubeconfig: cluster.Kubeconfig,
-		Conf:       &tempConf,
+		Id:          cluster.ID,
+		Name:        cluster.Name,
+		CreatedAt:   timestamppb.New(cluster.CreatedAt),
+		UpdatedAt:   timestamppb.New(cluster.UpdatedAt),
+		WorkflowId:  cluster.WorkflowId,
+		Status:      cluster.Status,
+		StatusDesc:  cluster.StatusDesc,
+		ContractId:  cluster.ContractID,
+		CspId:       cluster.CspID.String(),
+		Kubeconfig:  cluster.Kubeconfig,
+		Conf:        &tempConf,
+		Creator:     cluster.Creator.String(),
+		Description: cluster.Description,
 	}
 }

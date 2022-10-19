@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/google/uuid"
 	"github.com/openinfradev/tks-common/pkg/log"
 	"github.com/openinfradev/tks-info/pkg/application/model"
 	pb "github.com/openinfradev/tks-proto/tks_pb"
@@ -35,12 +36,23 @@ func (x *Accessor) Create(clusterID string, appGroup *pb.AppGroup) (string, erro
 			fmt.Errorf("can't create application group because external label %s already exists",
 				appGroup.GetExternalLabel())
 	}
+
+	creator := uuid.Nil
+	if appGroup.GetCreator() != "" {
+		creator, err = uuid.Parse(appGroup.GetCreator())
+		if err != nil {
+			return "", err
+		}
+	}
+
 	appGroupModel := model.ApplicationGroup{
 		Name:          appGroup.GetAppGroupName(),
 		ClusterId:     clusterID,
 		Type:          appGroup.GetType(),
 		Status:        appGroup.GetStatus(),
 		ExternalLabel: appGroup.GetExternalLabel(),
+		Creator:       creator,
+		Description:   appGroup.GetDescription(),
 	}
 	res := x.db.Create(&appGroupModel)
 	if res.Error != nil {
@@ -197,6 +209,8 @@ func reflectToPbAppGroup(model model.ApplicationGroup) *pb.AppGroup {
 		StatusDesc:    model.StatusDesc,
 		ClusterId:     model.ClusterId,
 		ExternalLabel: model.ExternalLabel,
+		Creator:       model.Creator.String(),
+		Description:   model.Description,
 		CreatedAt:     timestamppb.New(model.CreatedAt),
 		UpdatedAt:     timestamppb.New(model.UpdatedAt),
 	}
