@@ -27,7 +27,7 @@ func (x *AsaAccessor) Create(contractId string, app *pb.AppServeApp, task *pb.Ap
 	asaModel := model.AppServeApp{
 		Name:            app.GetName(),
 		ContractId:      contractId,
-		TaskType:        app.GetTaskType(),
+		Type:            app.GetType(),
 		TargetClusterId: app.GetTargetClusterId(),
 	}
 
@@ -116,10 +116,25 @@ func (x *AsaAccessor) GetAppServeApp(id uuid.UUID) (*pb.AppServeAppCombined, err
 }
 
 func (x *AsaAccessor) UpdateStatus(taskId uuid.UUID, status string, output string) error {
+	// Update task status
 	res := x.db.Model(&model.AppServeAppTask{}).Where("ID = ?", taskId).Updates(model.AppServeAppTask{Status: status, Output: output})
 
 	if res.Error != nil || res.RowsAffected == 0 {
 		return fmt.Errorf("UpdateStatus: nothing updated in AppServeAppTask with ID %s", taskId)
+	}
+
+	// Get Asa ID which this task belongs to.
+	var appServeAppTask model.AppServeAppTask
+	res = x.db.First(&appServeAppTask, "id = ?", taskId)
+	if res.RowsAffected == 0 || res.Error != nil {
+		return fmt.Errorf("Could not find AppServeAppTask with ID: %s", taskId)
+	}
+	asaId := appServeAppTask.AppServeAppId
+
+	// Update status of the Asa.
+	res = x.db.Model(&model.AppServeApp{}).Where("ID = ?", asaId).Update("Status", status)
+	if res.Error != nil || res.RowsAffected == 0 {
+		return fmt.Errorf("UpdateStatus: nothing updated in AppServeApp with id %s", asaId)
 	}
 
 	return nil
@@ -146,7 +161,7 @@ func ConvertToPbAppServeApp(asa model.AppServeApp) *pb.AppServeApp {
 		Id:              asa.ID.String(),
 		Name:            asa.Name,
 		ContractId:      asa.ContractId,
-		TaskType:        asa.TaskType,
+		Type:            asa.Type,
 		EndpointUrl:     asa.EndpointUrl,
 		TargetClusterId: asa.TargetClusterId,
 		CreatedAt:       timestamppb.New(asa.CreatedAt),

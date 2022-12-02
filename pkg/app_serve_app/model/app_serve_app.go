@@ -12,9 +12,10 @@ type AppServeApp struct {
 	ID              uuid.UUID `gorm:"primarykey;type:uuid;default:uuid_generate_v4()"`
 	Name            string
 	ContractId      string
-	TaskType        string
+	Type            string
 	EndpointUrl     string
 	TargetClusterId string
+	Status          string
 	CreatedAt       time.Time
 	UpdatedAt       time.Time
 }
