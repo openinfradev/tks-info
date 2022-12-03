@@ -24,6 +24,7 @@ func New(db *gorm.DB) *AsaAccessor {
 
 // Create creates a new appServeApp in database.
 func (x *AsaAccessor) Create(contractId string, app *pb.AppServeApp, task *pb.AppServeAppTask) (uuid.UUID, uuid.UUID, error) {
+	// TODO: should I set initial status field here?
 	asaModel := model.AppServeApp{
 		Name:            app.GetName(),
 		ContractId:      contractId,
@@ -37,12 +38,15 @@ func (x *AsaAccessor) Create(contractId string, app *pb.AppServeApp, task *pb.Ap
 	}
 
 	asaTaskModel := model.AppServeAppTask{
-		Version:       task.GetVersion(),
-		Status:        task.GetStatus(),
-		ArtifactUrl:   task.GetArtifactUrl(),
-		ImageUrl:      task.GetImageUrl(),
-		Profile:       task.GetProfile(),
-		AppServeAppId: asaModel.ID,
+		Version:        task.GetVersion(),
+		Status:         task.GetStatus(),
+		ArtifactUrl:    task.GetArtifactUrl(),
+		ImageUrl:       task.GetImageUrl(),
+		ExecutablePath: task.GetExecutablePath(),
+		ResourceSpec:   task.GetResourceSpec(),
+		Profile:        task.GetProfile(),
+		Port:           task.GetPort(),
+		AppServeAppId:  asaModel.ID,
 	}
 
 	res = x.db.Create(&asaTaskModel)
@@ -56,12 +60,15 @@ func (x *AsaAccessor) Create(contractId string, app *pb.AppServeApp, task *pb.Ap
 // Update creates new appServeApp Task for existing appServeApp.
 func (x *AsaAccessor) Update(appServeAppId uuid.UUID, task *pb.AppServeAppTask) (uuid.UUID, error) {
 	asaTaskModel := model.AppServeAppTask{
-		Version:       task.GetVersion(),
-		Status:        task.GetStatus(),
-		ArtifactUrl:   task.GetArtifactUrl(),
-		ImageUrl:      task.GetImageUrl(),
-		Profile:       task.GetProfile(),
-		AppServeAppId: appServeAppId,
+		Version:        task.GetVersion(),
+		Status:         task.GetStatus(),
+		ArtifactUrl:    task.GetArtifactUrl(),
+		ImageUrl:       task.GetImageUrl(),
+		ExecutablePath: task.GetExecutablePath(),
+		ResourceSpec:   task.GetResourceSpec(),
+		Profile:        task.GetProfile(),
+		Port:           task.GetPort(),
+		AppServeAppId:  appServeAppId,
 	}
 
 	res := x.db.Create(&asaTaskModel)
@@ -162,6 +169,7 @@ func ConvertToPbAppServeApp(asa model.AppServeApp) *pb.AppServeApp {
 		Name:            asa.Name,
 		ContractId:      asa.ContractId,
 		Type:            asa.Type,
+		Status:          asa.Status,
 		EndpointUrl:     asa.EndpointUrl,
 		TargetClusterId: asa.TargetClusterId,
 		CreatedAt:       timestamppb.New(asa.CreatedAt),
@@ -171,15 +179,18 @@ func ConvertToPbAppServeApp(asa model.AppServeApp) *pb.AppServeApp {
 
 func ConvertToPbAppServeAppTask(task model.AppServeAppTask) *pb.AppServeAppTask {
 	return &pb.AppServeAppTask{
-		Id:           task.ID.String(),
-		Version:      task.Version,
-		Status:       task.Status,
-		Output:       task.Output,
-		ImageUrl:     task.ImageUrl,
-		ArtifactUrl:  task.ArtifactUrl,
-		Profile:      task.Profile,
-		HelmRevision: task.HelmRevision,
-		CreatedAt:    timestamppb.New(task.CreatedAt),
-		UpdatedAt:    timestamppb.New(task.UpdatedAt),
+		Id:             task.ID.String(),
+		Version:        task.Version,
+		Status:         task.Status,
+		Output:         task.Output,
+		ImageUrl:       task.ImageUrl,
+		ArtifactUrl:    task.ArtifactUrl,
+		ResourceSpec:   task.ResourceSpec,
+		ExecutablePath: task.ExecutablePath,
+		Profile:        task.Profile,
+		Port:           task.Port,
+		HelmRevision:   task.HelmRevision,
+		CreatedAt:      timestamppb.New(task.CreatedAt),
+		UpdatedAt:      timestamppb.New(task.UpdatedAt),
 	}
 }
