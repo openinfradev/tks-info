@@ -9,7 +9,7 @@ RUN mkdir -p /build
 WORKDIR /build
 
 COPY . .
-RUN go mod tidy && go mod vendor
+RUN go mod tidy
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o bin/server ./cmd/server
 
 RUN mkdir -p /dist
