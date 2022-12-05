@@ -79,11 +79,16 @@ func (x *AsaAccessor) Update(appServeAppId uuid.UUID, task *pb.AppServeAppTask) 
 	return asaTaskModel.ID, nil
 }
 
-func (x *AsaAccessor) GetAppServeApps(contractId string) ([]*pb.AppServeApp, error) {
+func (x *AsaAccessor) GetAppServeApps(contractId string, showAll bool) ([]*pb.AppServeApp, error) {
 	var appServeApps []model.AppServeApp
 	pbAppServeApps := []*pb.AppServeApp{}
 
-	res := x.db.Find(&appServeApps, "contract_id = ?", contractId)
+	queryStr := fmt.Sprintf("contract_id = %s AND status <> 'DELETE_SUCCESS'", contractId)
+	if showAll {
+		queryStr = fmt.Sprintf("contract_id = %s", contractId)
+	}
+	res := x.db.Find(&appServeApps, queryStr)
+	//	res := x.db.Find(&appServeApps, "contract_id = ? AND status <> ?", contractId, "DELETE_SUCCESS")
 	if res.Error != nil {
 		return nil, fmt.Errorf("Error while finding appServeApps with contractID: %s", contractId)
 	}

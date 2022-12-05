@@ -153,6 +153,7 @@ func (s *AppServeAppServer) UpdateAppServeAppEndpoint(ctx context.Context, in *p
 
 func (s *AppServeAppServer) GetAppServeApps(ctx context.Context, in *pb.GetAppServeAppsRequest) (*pb.GetAppServeAppsResponse, error) {
 	contractId := in.GetContractId()
+	showAll := in.GetShowAll()
 
 	if !helper.ValidateContractId(contractId) {
 		res := pb.GetAppServeAppsResponse{
@@ -166,7 +167,7 @@ func (s *AppServeAppServer) GetAppServeApps(ctx context.Context, in *pb.GetAppSe
 
 	log.Info("GetAppServeApps request for contractId: ", contractId)
 
-	appServeApps, err := asaAccessor.GetAppServeApps(contractId)
+	appServeApps, err := asaAccessor.GetAppServeApps(contractId, showAll)
 	if err != nil {
 		return &pb.GetAppServeAppsResponse{
 			Code: pb.Code_INTERNAL,

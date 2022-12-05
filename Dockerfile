@@ -1,5 +1,5 @@
 FROM golang:1.16.3-stretch AS builder
-LABEL AUTHOR Seungkyu Ahn (seungkyua@gmail.com)
+LABEL AUTHOR SKT
 
 ARG PRV_GITHUB_TOKEN
 RUN go env -w GOPRIVATE=github.com/openinfradev/tks-info
