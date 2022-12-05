@@ -83,9 +83,9 @@ func (x *AsaAccessor) GetAppServeApps(contractId string, showAll bool) ([]*pb.Ap
 	var appServeApps []model.AppServeApp
 	pbAppServeApps := []*pb.AppServeApp{}
 
-	queryStr := fmt.Sprintf("contract_id = %s AND status <> 'DELETE_SUCCESS'", contractId)
+	queryStr := fmt.Sprintf("contract_id = '%s' AND status <> 'DELETE_SUCCESS'", contractId)
 	if showAll {
-		queryStr = fmt.Sprintf("contract_id = %s", contractId)
+		queryStr = fmt.Sprintf("contract_id = '%s'", contractId)
 	}
 	res := x.db.Find(&appServeApps, queryStr)
 	//	res := x.db.Find(&appServeApps, "contract_id = ? AND status <> ?", contractId, "DELETE_SUCCESS")
