@@ -1,5 +1,5 @@
-FROM golang:1.16.3-stretch AS builder
-LABEL AUTHOR SKT
+FROM golang:1.18.3-stretch AS builder
+LABEL AUTHOR SK Telecom
 
 ARG PRV_GITHUB_TOKEN
 RUN go env -w GOPRIVATE=github.com/openinfradev/tks-info
