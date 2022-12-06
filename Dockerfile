@@ -1,5 +1,5 @@
-FROM golang:1.16.3-stretch AS builder
-LABEL AUTHOR Seungkyu Ahn (seungkyua@gmail.com)
+FROM golang:1.18.3-stretch AS builder
+LABEL AUTHOR SK Telecom
 
 ARG PRV_GITHUB_TOKEN
 RUN go env -w GOPRIVATE=github.com/openinfradev/tks-info
@@ -9,7 +9,7 @@ RUN mkdir -p /build
 WORKDIR /build
 
 COPY . .
-RUN go mod tidy && go mod vendor
+RUN go mod tidy
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o bin/server ./cmd/server
 
 RUN mkdir -p /dist

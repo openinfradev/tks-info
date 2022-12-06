@@ -24,10 +24,11 @@ func New(db *gorm.DB) *AsaAccessor {
 
 // Create creates a new appServeApp in database.
 func (x *AsaAccessor) Create(contractId string, app *pb.AppServeApp, task *pb.AppServeAppTask) (uuid.UUID, uuid.UUID, error) {
+	// TODO: should I set initial status field here?
 	asaModel := model.AppServeApp{
 		Name:            app.GetName(),
 		ContractId:      contractId,
-		TaskType:        app.GetTaskType(),
+		Type:            app.GetType(),
 		TargetClusterId: app.GetTargetClusterId(),
 	}
 
@@ -37,12 +38,15 @@ func (x *AsaAccessor) Create(contractId string, app *pb.AppServeApp, task *pb.Ap
 	}
 
 	asaTaskModel := model.AppServeAppTask{
-		Version:       task.GetVersion(),
-		Status:        task.GetStatus(),
-		ArtifactUrl:   task.GetArtifactUrl(),
-		ImageUrl:      task.GetImageUrl(),
-		Profile:       task.GetProfile(),
-		AppServeAppId: asaModel.ID,
+		Version:        task.GetVersion(),
+		Status:         task.GetStatus(),
+		ArtifactUrl:    task.GetArtifactUrl(),
+		ImageUrl:       task.GetImageUrl(),
+		ExecutablePath: task.GetExecutablePath(),
+		ResourceSpec:   task.GetResourceSpec(),
+		Profile:        task.GetProfile(),
+		Port:           task.GetPort(),
+		AppServeAppId:  asaModel.ID,
 	}
 
 	res = x.db.Create(&asaTaskModel)
@@ -56,12 +60,15 @@ func (x *AsaAccessor) Create(contractId string, app *pb.AppServeApp, task *pb.Ap
 // Update creates new appServeApp Task for existing appServeApp.
 func (x *AsaAccessor) Update(appServeAppId uuid.UUID, task *pb.AppServeAppTask) (uuid.UUID, error) {
 	asaTaskModel := model.AppServeAppTask{
-		Version:       task.GetVersion(),
-		Status:        task.GetStatus(),
-		ArtifactUrl:   task.GetArtifactUrl(),
-		ImageUrl:      task.GetImageUrl(),
-		Profile:       task.GetProfile(),
-		AppServeAppId: appServeAppId,
+		Version:        task.GetVersion(),
+		Status:         task.GetStatus(),
+		ArtifactUrl:    task.GetArtifactUrl(),
+		ImageUrl:       task.GetImageUrl(),
+		ExecutablePath: task.GetExecutablePath(),
+		ResourceSpec:   task.GetResourceSpec(),
+		Profile:        task.GetProfile(),
+		Port:           task.GetPort(),
+		AppServeAppId:  appServeAppId,
 	}
 
 	res := x.db.Create(&asaTaskModel)
@@ -72,11 +79,16 @@ func (x *AsaAccessor) Update(appServeAppId uuid.UUID, task *pb.AppServeAppTask) 
 	return asaTaskModel.ID, nil
 }
 
-func (x *AsaAccessor) GetAppServeApps(contractId string) ([]*pb.AppServeApp, error) {
+func (x *AsaAccessor) GetAppServeApps(contractId string, showAll bool) ([]*pb.AppServeApp, error) {
 	var appServeApps []model.AppServeApp
 	pbAppServeApps := []*pb.AppServeApp{}
 
-	res := x.db.Find(&appServeApps, "contract_id = ?", contractId)
+	queryStr := fmt.Sprintf("contract_id = '%s' AND status <> 'DELETE_SUCCESS'", contractId)
+	if showAll {
+		queryStr = fmt.Sprintf("contract_id = '%s'", contractId)
+	}
+	res := x.db.Find(&appServeApps, queryStr)
+	//	res := x.db.Find(&appServeApps, "contract_id = ? AND status <> ?", contractId, "DELETE_SUCCESS")
 	if res.Error != nil {
 		return nil, fmt.Errorf("Error while finding appServeApps with contractID: %s", contractId)
 	}
@@ -116,10 +128,25 @@ func (x *AsaAccessor) GetAppServeApp(id uuid.UUID) (*pb.AppServeAppCombined, err
 }
 
 func (x *AsaAccessor) UpdateStatus(taskId uuid.UUID, status string, output string) error {
+	// Update task status
 	res := x.db.Model(&model.AppServeAppTask{}).Where("ID = ?", taskId).Updates(model.AppServeAppTask{Status: status, Output: output})
 
 	if res.Error != nil || res.RowsAffected == 0 {
 		return fmt.Errorf("UpdateStatus: nothing updated in AppServeAppTask with ID %s", taskId)
+	}
+
+	// Get Asa ID which this task belongs to.
+	var appServeAppTask model.AppServeAppTask
+	res = x.db.First(&appServeAppTask, "id = ?", taskId)
+	if res.RowsAffected == 0 || res.Error != nil {
+		return fmt.Errorf("Could not find AppServeAppTask with ID: %s", taskId)
+	}
+	asaId := appServeAppTask.AppServeAppId
+
+	// Update status of the Asa.
+	res = x.db.Model(&model.AppServeApp{}).Where("ID = ?", asaId).Update("Status", status)
+	if res.Error != nil || res.RowsAffected == 0 {
+		return fmt.Errorf("UpdateStatus: nothing updated in AppServeApp with id %s", asaId)
 	}
 
 	return nil
@@ -146,7 +173,8 @@ func ConvertToPbAppServeApp(asa model.AppServeApp) *pb.AppServeApp {
 		Id:              asa.ID.String(),
 		Name:            asa.Name,
 		ContractId:      asa.ContractId,
-		TaskType:        asa.TaskType,
+		Type:            asa.Type,
+		Status:          asa.Status,
 		EndpointUrl:     asa.EndpointUrl,
 		TargetClusterId: asa.TargetClusterId,
 		CreatedAt:       timestamppb.New(asa.CreatedAt),
@@ -156,15 +184,18 @@ func ConvertToPbAppServeApp(asa model.AppServeApp) *pb.AppServeApp {
 
 func ConvertToPbAppServeAppTask(task model.AppServeAppTask) *pb.AppServeAppTask {
 	return &pb.AppServeAppTask{
-		Id:           task.ID.String(),
-		Version:      task.Version,
-		Status:       task.Status,
-		Output:       task.Output,
-		ImageUrl:     task.ImageUrl,
-		ArtifactUrl:  task.ArtifactUrl,
-		Profile:      task.Profile,
-		HelmRevision: task.HelmRevision,
-		CreatedAt:    timestamppb.New(task.CreatedAt),
-		UpdatedAt:    timestamppb.New(task.UpdatedAt),
+		Id:             task.ID.String(),
+		Version:        task.Version,
+		Status:         task.Status,
+		Output:         task.Output,
+		ImageUrl:       task.ImageUrl,
+		ArtifactUrl:    task.ArtifactUrl,
+		ResourceSpec:   task.ResourceSpec,
+		ExecutablePath: task.ExecutablePath,
+		Profile:        task.Profile,
+		Port:           task.Port,
+		HelmRevision:   task.HelmRevision,
+		CreatedAt:      timestamppb.New(task.CreatedAt),
+		UpdatedAt:      timestamppb.New(task.UpdatedAt),
 	}
 }
