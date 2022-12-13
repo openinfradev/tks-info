@@ -13,6 +13,7 @@ type AppServeApp struct {
 	Name            string
 	ContractId      string
 	Type            string
+	AppType         string
 	EndpointUrl     string
 	TargetClusterId string
 	Status          string

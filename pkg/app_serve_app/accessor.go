@@ -29,6 +29,7 @@ func (x *AsaAccessor) Create(contractId string, app *pb.AppServeApp, task *pb.Ap
 		Name:            app.GetName(),
 		ContractId:      contractId,
 		Type:            app.GetType(),
+		AppType:         app.GetAppType(),
 		TargetClusterId: app.GetTargetClusterId(),
 	}
 
@@ -174,6 +175,7 @@ func ConvertToPbAppServeApp(asa model.AppServeApp) *pb.AppServeApp {
 		Name:            asa.Name,
 		ContractId:      asa.ContractId,
 		Type:            asa.Type,
+		AppType:         asa.AppType,
 		Status:          asa.Status,
 		EndpointUrl:     asa.EndpointUrl,
 		TargetClusterId: asa.TargetClusterId,
