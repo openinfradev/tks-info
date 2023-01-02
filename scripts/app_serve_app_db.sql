@@ -5,6 +5,7 @@ CREATE TABLE app_serve_apps
     name character varying(50) COLLATE pg_catalog."default",
     contract_id character varying(10) COLLATE pg_catalog."default",
     type character varying(10) COLLATE pg_catalog."default",
+    app_type character varying(20) COLLATE pg_catalog."default",
     status character varying(20) COLLATE pg_catalog."default",
     endpoint_url character varying(300) COLLATE pg_catalog."default",
     target_cluster_id character varying(10) COLLATE pg_catalog."default",
