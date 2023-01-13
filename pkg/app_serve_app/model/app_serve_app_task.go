@@ -19,6 +19,9 @@ type AppServeAppTask struct {
 	ExecutablePath string
 	ResourceSpec   string
 	Profile        string
+	AppConfig      string
+	AppSecret      string
+	ExtraEnv       string
 	Port           string
 	HelmRevision   int32
 	CreatedAt      time.Time
