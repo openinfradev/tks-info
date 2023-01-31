@@ -12,6 +12,7 @@ type AppServeAppTask struct {
 	ID             uuid.UUID `gorm:"primarykey;type:uuid;default:uuid_generate_v4()"`
 	AppServeAppId  uuid.UUID
 	Version        string
+	Strategy       string
 	Status         string
 	Output         string
 	ArtifactUrl    string

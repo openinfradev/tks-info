@@ -136,7 +136,7 @@ func (s *AppServeAppServer) UpdateAppServeAppEndpoint(ctx context.Context, in *p
 		}, err
 	}
 
-	err = asaAccessor.UpdateEndpoint(appServeAppId, appServeAppTaskId, in.GetEndpoint(), in.GetHelmRevision())
+	err = asaAccessor.UpdateEndpoint(appServeAppId, appServeAppTaskId, in.GetEndpoint(), in.GetPreviewEndpoint(), in.GetHelmRevision())
 	if err != nil {
 		return &pb.SimpleResponse{
 			Code: pb.Code_INTERNAL,

@@ -159,9 +159,9 @@ func (x *AsaAccessor) UpdateStatus(taskId uuid.UUID, status string, output strin
 	return nil
 }
 
-func (x *AsaAccessor) UpdateEndpoint(id uuid.UUID, taskId uuid.UUID, endpoint string, helmRevision int32) error {
-	// Update Endpoint
-	res := x.db.Model(&model.AppServeApp{}).Where("ID = ?", id).Update("EndpointUrl", endpoint)
+func (x *AsaAccessor) UpdateEndpoint(id uuid.UUID, taskId uuid.UUID, endpoint string, previewEndpoint string, helmRevision int32) error {
+	// Update Endpoints
+	res := x.db.Model(&model.AppServeApp{}).Where("ID = ?", id).Updates(model.AppServeApp{EndpointUrl: endpoint, PreviewEndpointUrl: previewEndpoint})
 	if res.Error != nil || res.RowsAffected == 0 {
 		return fmt.Errorf("UpdateEndpoint: nothing updated in AppServeApp with id %s", id)
 	}
@@ -177,16 +177,17 @@ func (x *AsaAccessor) UpdateEndpoint(id uuid.UUID, taskId uuid.UUID, endpoint st
 
 func ConvertToPbAppServeApp(asa model.AppServeApp) *pb.AppServeApp {
 	return &pb.AppServeApp{
-		Id:              asa.ID.String(),
-		Name:            asa.Name,
-		ContractId:      asa.ContractId,
-		Type:            asa.Type,
-		AppType:         asa.AppType,
-		Status:          asa.Status,
-		EndpointUrl:     asa.EndpointUrl,
-		TargetClusterId: asa.TargetClusterId,
-		CreatedAt:       timestamppb.New(asa.CreatedAt),
-		UpdatedAt:       timestamppb.New(asa.UpdatedAt),
+		Id:                 asa.ID.String(),
+		Name:               asa.Name,
+		ContractId:         asa.ContractId,
+		Type:               asa.Type,
+		AppType:            asa.AppType,
+		Status:             asa.Status,
+		EndpointUrl:        asa.EndpointUrl,
+		PreviewEndpointUrl: asa.PreviewEndpointUrl,
+		TargetClusterId:    asa.TargetClusterId,
+		CreatedAt:          timestamppb.New(asa.CreatedAt),
+		UpdatedAt:          timestamppb.New(asa.UpdatedAt),
 	}
 }
 
@@ -194,6 +195,7 @@ func ConvertToPbAppServeAppTask(task model.AppServeAppTask) *pb.AppServeAppTask 
 	return &pb.AppServeAppTask{
 		Id:             task.ID.String(),
 		Version:        task.Version,
+		Strategy:       task.Strategy,
 		Status:         task.Status,
 		Output:         task.Output,
 		ImageUrl:       task.ImageUrl,
