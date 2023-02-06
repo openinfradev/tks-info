@@ -30,6 +30,8 @@ func (x *AsaAccessor) Create(contractId string, app *pb.AppServeApp, task *pb.Ap
 		ContractId:      contractId,
 		Type:            app.GetType(),
 		AppType:         app.GetAppType(),
+		EndpointUrl:         "N/A",
+		PreviewEndpointUrl:         "N/A",
 		TargetClusterId: app.GetTargetClusterId(),
 	}
 
@@ -40,6 +42,7 @@ func (x *AsaAccessor) Create(contractId string, app *pb.AppServeApp, task *pb.Ap
 
 	asaTaskModel := model.AppServeAppTask{
 		Version:        task.GetVersion(),
+		Strategy:       task.GetStrategy(),
 		Status:         task.GetStatus(),
 		ArtifactUrl:    task.GetArtifactUrl(),
 		ImageUrl:       task.GetImageUrl(),
