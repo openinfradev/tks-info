@@ -26,13 +26,13 @@ func New(db *gorm.DB) *AsaAccessor {
 func (x *AsaAccessor) Create(contractId string, app *pb.AppServeApp, task *pb.AppServeAppTask) (uuid.UUID, uuid.UUID, error) {
 	// TODO: should I set initial status field here?
 	asaModel := model.AppServeApp{
-		Name:            app.GetName(),
-		ContractId:      contractId,
-		Type:            app.GetType(),
-		AppType:         app.GetAppType(),
-		EndpointUrl:         "N/A",
-		PreviewEndpointUrl:         "N/A",
-		TargetClusterId: app.GetTargetClusterId(),
+		Name:               app.GetName(),
+		ContractId:         contractId,
+		Type:               app.GetType(),
+		AppType:            app.GetAppType(),
+		EndpointUrl:        "N/A",
+		PreviewEndpointUrl: "N/A",
+		TargetClusterId:    app.GetTargetClusterId(),
 	}
 
 	res := x.db.Create(&asaModel)
@@ -97,8 +97,7 @@ func (x *AsaAccessor) GetAppServeApps(contractId string, showAll bool) ([]*pb.Ap
 	if showAll {
 		queryStr = fmt.Sprintf("contract_id = '%s'", contractId)
 	}
-	res := x.db.Find(&appServeApps, queryStr)
-	//	res := x.db.Find(&appServeApps, "contract_id = ? AND status <> ?", contractId, "DELETE_SUCCESS")
+	res := x.db.Order("created_at desc").Find(&appServeApps, queryStr)
 	if res.Error != nil {
 		return nil, fmt.Errorf("Error while finding appServeApps with contractID: %s", contractId)
 	}
@@ -125,7 +124,7 @@ func (x *AsaAccessor) GetAppServeApp(id uuid.UUID) (*pb.AppServeAppCombined, err
 	}
 	pbAppServeAppCombined.AppServeApp = ConvertToPbAppServeApp(appServeApp)
 
-	res = x.db.Order("created_at asc").Find(&appServeAppTasks, "app_serve_app_id = ?", id)
+	res = x.db.Order("created_at desc").Find(&appServeAppTasks, "app_serve_app_id = ?", id)
 	if res.Error != nil {
 		return nil, fmt.Errorf("Error while finding appServeAppTasks with appServeApp ID %s. Err: %s", id, res.Error)
 	}
