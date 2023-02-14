@@ -68,6 +68,7 @@ func (x *AsaAccessor) Create(contractId string, app *pb.AppServeApp, task *pb.Ap
 func (x *AsaAccessor) Update(appServeAppId uuid.UUID, task *pb.AppServeAppTask) (uuid.UUID, error) {
 	asaTaskModel := model.AppServeAppTask{
 		Version:        task.GetVersion(),
+		Strategy:       task.GetStrategy(),
 		Status:         task.GetStatus(),
 		ArtifactUrl:    task.GetArtifactUrl(),
 		ImageUrl:       task.GetImageUrl(),
