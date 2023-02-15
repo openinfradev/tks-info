@@ -163,16 +163,35 @@ func (x *AsaAccessor) UpdateStatus(taskId uuid.UUID, status string, output strin
 }
 
 func (x *AsaAccessor) UpdateEndpoint(id uuid.UUID, taskId uuid.UUID, endpoint string, previewEndpoint string, helmRevision int32) error {
-	// Update Endpoints
-	res := x.db.Model(&model.AppServeApp{}).Where("ID = ?", id).Updates(model.AppServeApp{EndpointUrl: endpoint, PreviewEndpointUrl: previewEndpoint})
-	if res.Error != nil || res.RowsAffected == 0 {
-		return fmt.Errorf("UpdateEndpoint: nothing updated in AppServeApp with id %s", id)
+	if endpoint != "" && previewEndpoint != "" {
+		// Both endpoints are valid
+		res := x.db.Model(&model.AppServeApp{}).Where("ID = ?", id).Updates(model.AppServeApp{EndpointUrl: endpoint, PreviewEndpointUrl: previewEndpoint})
+		if res.Error != nil || res.RowsAffected == 0 {
+			return fmt.Errorf("UpdateEndpoint: nothing updated in AppServeApp with id %s", id)
+		}
+	} else if endpoint != "" {
+		// endpoint-only case
+		res := x.db.Model(&model.AppServeApp{}).Where("ID = ?", id).Update("EndpointUrl", endpoint)
+		if res.Error != nil || res.RowsAffected == 0 {
+			return fmt.Errorf("UpdateEndpoint: nothing updated in AppServeApp with id %s", id)
+		}
+	} else if previewEndpoint != "" {
+		// previewEndpoint-only case
+		res := x.db.Model(&model.AppServeApp{}).Where("ID = ?", id).Update("PreviewEndpointUrl", previewEndpoint)
+		if res.Error != nil || res.RowsAffected == 0 {
+			return fmt.Errorf("UpdateEndpoint: nothing updated in AppServeApp with id %s", id)
+		}
+	} else {
+		return fmt.Errorf("UpdateEndpoint: No endpoint provided. At least one of [endpoint, preview_endpoint] should be provided.")
 	}
 
 	// Update helm revision
-	res = x.db.Model(&model.AppServeAppTask{}).Where("ID = ?", taskId).Update("HelmRevision", helmRevision)
-	if res.Error != nil || res.RowsAffected == 0 {
-		return fmt.Errorf("UpdateEndpoint: nothing updated in AppServeAppTask with id %s", id)
+	// Ignore if the value is less than 0
+	if helmRevision > 0 {
+		res := x.db.Model(&model.AppServeAppTask{}).Where("ID = ?", taskId).Update("HelmRevision", helmRevision)
+		if res.Error != nil || res.RowsAffected == 0 {
+			return fmt.Errorf("UpdateEndpoint: helm revision was not updated for AppServeAppTask with task ID %s", taskId)
+		}
 	}
 
 	return nil
