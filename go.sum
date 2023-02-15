@@ -828,8 +828,8 @@ github.com/opencontainers/selinux v1.10.0/go.mod h1:2i0OySw99QjzBBQByd1Gr9gSjvuh
 github.com/openinfradev/tks-common v0.0.0-20221122025625-be9f8957ec3c h1:T2avUvDszuwYPeF7k0F+/44puxaB2IT4BBI2We8SDgg=
 github.com/openinfradev/tks-common v0.0.0-20221122025625-be9f8957ec3c/go.mod h1:6TpIXT+j/HAb6LCY7TkPLpVqKKODiopNoLhQArO8bms=
 github.com/openinfradev/tks-proto v0.0.6-0.20220831015809-fad377174017/go.mod h1:IIxiwEZVfqLXm/O4KGiD0q/ELlyKxXx44TCM5ZWhpJs=
-github.com/openinfradev/tks-proto v0.0.6-0.20221205025315-451bdf1a7a21 h1:3qGsqFRW7EUhP/h0pYUGuNDLOmqM4aWoWwyOajkPt8I=
-github.com/openinfradev/tks-proto v0.0.6-0.20221205025315-451bdf1a7a21/go.mod h1:h8JLmbwzw5C+vu/cqUuLHyqluy7MKK6EWNqLnWZBcTU=
+github.com/openinfradev/tks-proto v0.0.6-0.20230209014521-c44086e732d8 h1:WODh1xKCTUiS6hwHtnFnAcMBT/lzOE2aEl/1X7A3nak=
+github.com/openinfradev/tks-proto v0.0.6-0.20230209014521-c44086e732d8/go.mod h1:h8JLmbwzw5C+vu/cqUuLHyqluy7MKK6EWNqLnWZBcTU=
 github.com/opentracing-contrib/go-observer v0.0.0-20170622124052-a52f23424492/go.mod h1:Ngi6UdF0k5OKD5t5wlmGhe/EDKPoUM3BXZSSfIuJbis=
 github.com/opentracing/basictracer-go v1.0.0/go.mod h1:QfBfYuafItcjQuMwinw9GhYKwFXS9KnPs5lxoYwgW74=
 github.com/opentracing/opentracing-go v1.0.2/go.mod h1:UkNAQd3GIcIGf0SeVgPpRdFStlNbqXla1AfSYxPUl2o=
