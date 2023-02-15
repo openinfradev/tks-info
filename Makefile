@@ -23,4 +23,4 @@ test:
 	go test -v ./... -cover
 
 docker:
-	docker build --no-cache -t tks-info -f Dockerfile .
+	docker build --platform=linux/amd64 --no-cache -t tks-info -f Dockerfile .

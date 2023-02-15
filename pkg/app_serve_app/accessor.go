@@ -26,11 +26,13 @@ func New(db *gorm.DB) *AsaAccessor {
 func (x *AsaAccessor) Create(contractId string, app *pb.AppServeApp, task *pb.AppServeAppTask) (uuid.UUID, uuid.UUID, error) {
 	// TODO: should I set initial status field here?
 	asaModel := model.AppServeApp{
-		Name:            app.GetName(),
-		ContractId:      contractId,
-		Type:            app.GetType(),
-		AppType:         app.GetAppType(),
-		TargetClusterId: app.GetTargetClusterId(),
+		Name:               app.GetName(),
+		ContractId:         contractId,
+		Type:               app.GetType(),
+		AppType:            app.GetAppType(),
+		EndpointUrl:        "N/A",
+		PreviewEndpointUrl: "N/A",
+		TargetClusterId:    app.GetTargetClusterId(),
 	}
 
 	res := x.db.Create(&asaModel)
@@ -40,6 +42,7 @@ func (x *AsaAccessor) Create(contractId string, app *pb.AppServeApp, task *pb.Ap
 
 	asaTaskModel := model.AppServeAppTask{
 		Version:        task.GetVersion(),
+		Strategy:       task.GetStrategy(),
 		Status:         task.GetStatus(),
 		ArtifactUrl:    task.GetArtifactUrl(),
 		ImageUrl:       task.GetImageUrl(),
@@ -65,6 +68,7 @@ func (x *AsaAccessor) Create(contractId string, app *pb.AppServeApp, task *pb.Ap
 func (x *AsaAccessor) Update(appServeAppId uuid.UUID, task *pb.AppServeAppTask) (uuid.UUID, error) {
 	asaTaskModel := model.AppServeAppTask{
 		Version:        task.GetVersion(),
+		Strategy:       task.GetStrategy(),
 		Status:         task.GetStatus(),
 		ArtifactUrl:    task.GetArtifactUrl(),
 		ImageUrl:       task.GetImageUrl(),
@@ -94,8 +98,7 @@ func (x *AsaAccessor) GetAppServeApps(contractId string, showAll bool) ([]*pb.Ap
 	if showAll {
 		queryStr = fmt.Sprintf("contract_id = '%s'", contractId)
 	}
-	res := x.db.Find(&appServeApps, queryStr)
-	//	res := x.db.Find(&appServeApps, "contract_id = ? AND status <> ?", contractId, "DELETE_SUCCESS")
+	res := x.db.Order("created_at desc").Find(&appServeApps, queryStr)
 	if res.Error != nil {
 		return nil, fmt.Errorf("Error while finding appServeApps with contractID: %s", contractId)
 	}
@@ -122,7 +125,7 @@ func (x *AsaAccessor) GetAppServeApp(id uuid.UUID) (*pb.AppServeAppCombined, err
 	}
 	pbAppServeAppCombined.AppServeApp = ConvertToPbAppServeApp(appServeApp)
 
-	res = x.db.Order("created_at asc").Find(&appServeAppTasks, "app_serve_app_id = ?", id)
+	res = x.db.Order("created_at desc").Find(&appServeAppTasks, "app_serve_app_id = ?", id)
 	if res.Error != nil {
 		return nil, fmt.Errorf("Error while finding appServeAppTasks with appServeApp ID %s. Err: %s", id, res.Error)
 	}
@@ -159,9 +162,9 @@ func (x *AsaAccessor) UpdateStatus(taskId uuid.UUID, status string, output strin
 	return nil
 }
 
-func (x *AsaAccessor) UpdateEndpoint(id uuid.UUID, taskId uuid.UUID, endpoint string, helmRevision int32) error {
-	// Update Endpoint
-	res := x.db.Model(&model.AppServeApp{}).Where("ID = ?", id).Update("EndpointUrl", endpoint)
+func (x *AsaAccessor) UpdateEndpoint(id uuid.UUID, taskId uuid.UUID, endpoint string, previewEndpoint string, helmRevision int32) error {
+	// Update Endpoints
+	res := x.db.Model(&model.AppServeApp{}).Where("ID = ?", id).Updates(model.AppServeApp{EndpointUrl: endpoint, PreviewEndpointUrl: previewEndpoint})
 	if res.Error != nil || res.RowsAffected == 0 {
 		return fmt.Errorf("UpdateEndpoint: nothing updated in AppServeApp with id %s", id)
 	}
@@ -177,16 +180,17 @@ func (x *AsaAccessor) UpdateEndpoint(id uuid.UUID, taskId uuid.UUID, endpoint st
 
 func ConvertToPbAppServeApp(asa model.AppServeApp) *pb.AppServeApp {
 	return &pb.AppServeApp{
-		Id:              asa.ID.String(),
-		Name:            asa.Name,
-		ContractId:      asa.ContractId,
-		Type:            asa.Type,
-		AppType:         asa.AppType,
-		Status:          asa.Status,
-		EndpointUrl:     asa.EndpointUrl,
-		TargetClusterId: asa.TargetClusterId,
-		CreatedAt:       timestamppb.New(asa.CreatedAt),
-		UpdatedAt:       timestamppb.New(asa.UpdatedAt),
+		Id:                 asa.ID.String(),
+		Name:               asa.Name,
+		ContractId:         asa.ContractId,
+		Type:               asa.Type,
+		AppType:            asa.AppType,
+		Status:             asa.Status,
+		EndpointUrl:        asa.EndpointUrl,
+		PreviewEndpointUrl: asa.PreviewEndpointUrl,
+		TargetClusterId:    asa.TargetClusterId,
+		CreatedAt:          timestamppb.New(asa.CreatedAt),
+		UpdatedAt:          timestamppb.New(asa.UpdatedAt),
 	}
 }
 
@@ -194,6 +198,7 @@ func ConvertToPbAppServeAppTask(task model.AppServeAppTask) *pb.AppServeAppTask 
 	return &pb.AppServeAppTask{
 		Id:             task.ID.String(),
 		Version:        task.Version,
+		Strategy:       task.Strategy,
 		Status:         task.Status,
 		Output:         task.Output,
 		ImageUrl:       task.ImageUrl,
