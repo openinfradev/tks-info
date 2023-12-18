@@ -11,7 +11,7 @@ require (
 	github.com/openinfradev/tks-common v0.0.0-20221122025625-be9f8957ec3c
 	github.com/openinfradev/tks-proto v0.0.6-0.20230209014521-c44086e732d8
 	github.com/stretchr/testify v1.7.0
-	golang.org/x/crypto v0.0.0-20220210151621-f4118a5b28e2 // indirect
+	golang.org/x/crypto v0.17.0 // indirect
 	google.golang.org/genproto v0.0.0-20220211171837-173942840c17 // indirect
 	google.golang.org/grpc v1.44.0
 	google.golang.org/protobuf v1.28.1
